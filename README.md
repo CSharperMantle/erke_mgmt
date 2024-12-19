@@ -12,3 +12,5 @@ Open design files with PowerDesigner.
   * erke_cdm.*: Conceptual data model
   * erke_ldm.*: Logical data model (generated from CDM)
   * erke_pdm.*: Physical data model (generated from LDM)
+* notes/: Design notes
+* sql/: Handwritten SQL scripts
