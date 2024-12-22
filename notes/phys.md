@@ -38,12 +38,12 @@
 
 ## 视图
 
-* 聚合评价 (`v_RateAgg`)
+* 聚合评价 (`v_RateAgg(activity_id INT4, rate_cnt INT4, rate_avg DECIMAL, rate_max DECIMAL, rate_min DECIMAL)`)
   * 提供每项活动的评分人数、评分均值、最高分与最低分
-* 活动报名人数 (`v_ActivitySignUpCount`)
+* 活动报名人数 (`v_ActivitySignUpCount(activity_id INT4, cnt INT4)`)
   * 提供每项活动的报名人数
-* 开放活动 (`v_AvailActivity`)
-  * 根据学生年级筛选对该生开放的活动
+* 开放活动 (`v_AvailActivity(student_id INT4, activity_id INT4)`)
+  * 根据学生年级信息筛选对该生开放的活动
 
 ## 索引列
 
