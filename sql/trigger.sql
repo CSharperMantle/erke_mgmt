@@ -1,6 +1,11 @@
 CREATE OR REPLACE FUNCTION tf_activity_update_check() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF NOT EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id=NEW.activity_id AND CURRENT_TIMESTAMP<activity_signup_start_time
+  ) THEN
+    RAISE EXCEPTION 'activity is already open for signing up';
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
