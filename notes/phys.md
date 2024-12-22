@@ -32,7 +32,7 @@
 ### 隐式状态
 
 * 活动未开始报名: `CURRENT_TIMESTAMP < activity.activity_signup_start_time`
-* 活动已开始报名: `CURRENT_TIMESTAMP >= activity.activity_signup_start_time AND CURRENT_TIMESTAMP < activity.activity_signup_end_time`
+* 活动已开始报名: `CURRENT_TIMESTAMP BETWEEN activity.activity_signup_start_time AND activity.activity_signup_end_time`
 * 未过活动开始时间: `CURRENT_TIMESTAMP < activity_start_time`
 * 已过活动开始时间: `CURRENT_TIMESTAMP >= activity_start_time`
 
