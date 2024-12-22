@@ -1,5 +1,23 @@
 # 物理结构
 
+## 用户与角色
+
+### 角色
+
+* `erke_admin`: 管理员
+* `erke_auditor`: 审核员 (NOLOGIN)
+* `erke_organizer`: 组织者 (NOLOGIN)
+* `erke_student`: 学生 (NOLOGIN)
+
+### 用户
+
+* `erke_auditor_[0-9]+`: 审核员用户
+  * 属于 `erke_auditor`
+* `erke_organizer_[0-9]+`: 组织者用户
+  * 属于 `erke_organizer`
+* `erke_student_[0-9]+`:  学生用户
+  * 属于 `erke_student`
+
 ## 活动状态定义
 
 ### 显式状态 (`activity.activity_state`)
