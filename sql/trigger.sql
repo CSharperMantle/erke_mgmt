@@ -34,16 +34,16 @@ BEGIN
   IF EXIST(
     SELECT 1 FROM SignUp s JOIN Activity a ON s.activity_id=a.activity_id
     WHERE a.activity_id=NEW.activity_id GROUP BY a.activity_id
-    HAVING COUNT(s.student_id)>=a.activity_max_particp_count  
+    HAVING COUNT(s.student_id)>=a.activity_max_particp_count
   )THEN
     RASIE EXCEPTION 'activity is alread full';
   
   IF EXISTS (
     SELECT 1 FROM SignUp s JOIN Activity a ON s.activity_id=a.activity_id
     WHERE  s.student_id=NEW.student_id AND (a.activity_start_time,a.activity_end_time)
-    OVERLAPS(SELECT activity_start_time,activity_end_time FROM Activity WHERE activity_id=NEW.activity_id) 
+    OVERLAPS(SELECT activity_start_time,activity_end_time FROM Activity WHERE activity_id=NEW.activity_id)
   )THEN
-    RAISE EXCEPTION 'time conflict with other activities'
+    RAISE EXCEPTION 'time conflict with other activities';
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -65,7 +65,11 @@ EXECUTE PROCEDURE tf_initiatecheckin_insert_check_activity_state();
 
 CREATE OR REPLACE FUNCTION tf_initiatecheckin_insert_update_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF EXISTS(
+    SELECT 1 FROM Activity WHERE activity_id=NEW.activity_id AND activity_state=1
+  )THEN
+    UPDATE Activity SET activity_state=2
+    WHERE activity_id=NEW.activity_id;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
