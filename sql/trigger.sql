@@ -11,6 +11,7 @@ EXECUTE PROCEDURE tf_activity_update_check();
 
 CREATE OR REPLACE FUNCTION tf_signup_insert_check() RETURNS TRIGGER AS $$
 BEGIN
+  // 1111
   RAISE WARNING 'not implemented';
   RETURN NEW;
 END;
