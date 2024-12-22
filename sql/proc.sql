@@ -77,6 +77,6 @@ CREATE OR REPLACE FUNCTION f_gen_random_checkinout_code()
 RETURNS VARCHAR AS $$
 DECLARE
 BEGIN
-  RAISE EXCEPTION 'not implemented';
+  RETURN '111111';
 END;
 $$ LANGUAGE plpgsql;
