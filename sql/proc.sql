@@ -76,7 +76,8 @@ END;
 CREATE OR REPLACE FUNCTION f_gen_random_checkinout_code()
 RETURNS VARCHAR AS $$
 DECLARE
+  salt CONSTANT VARCHAR := 'erke_';
 BEGIN
-  RETURN '111111';
+  RETURN LPAD(ABS((('x' || LEFT(MD5(salt || CURRENT_TIMESTAMP), 8))::BIT(32)::INT4 % 100000000)::TEXT), 8, '0');
 END;
 $$ LANGUAGE plpgsql;
