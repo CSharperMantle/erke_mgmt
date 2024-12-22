@@ -10,40 +10,51 @@ ON Activity FOR EACH ROW
 EXECUTE PROCEDURE tf_activity_update_check();
 
 CREATE OR REPLACE FUNCTION tf_signup_insert_check() RETURNS TRIGGER AS $$
+DECLARE
+  current_count INTEGER;
+  max_count INTEGER;
 BEGIN
-  IF NOT EXISTS(
-    SELECT 1 FROM BeOpenTO b JOIN Student s ON b.grade_value=s.grade_value
+  IF NOT EXISTS (
+    SELECT 1 FROM BeOpenTo b
+    JOIN Student s ON b.grade_value=s.grade_value
     WHERE b.activity_id=NEW.activity_id AND s.student_id=NEW.student_id
-  )THEN 
+  ) THEN 
     RAISE EXCEPTION 'not open to this grade.';
   END IF;
 
-  IF EXISTS (
-    SELECT 1 FROM Activity WHERE activity_id = NEW.activity_id AND activity_state = 1
-    ) THEN
-  ELSE
+  IF NOT EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id=NEW.activity_id
+    AND CURRENT_TIMESTAMP BETWEEN activity_sign_up_start_time AND activity_sign_up_end_time
+  ) THEN
     RAISE EXCEPTION 'activity is not in the sign-up phase.';
   END IF;
 
   IF EXISTS (
-    SELECT 1 FROM SignUp WHERE student_id=NEW.student_id AND activity_id=NEW.activity_id
-  )THEN
+    SELECT 1 FROM SignUp
+    WHERE student_id=NEW.student_id AND activity_id=NEW.activity_id
+  ) THEN
     RAISE EXCEPTION 'already sign up for this activity';
   END IF;
   
-  IF EXIST(
-    SELECT 1 FROM SignUp s JOIN Activity a ON s.activity_id=a.activity_id
-    WHERE a.activity_id=NEW.activity_id GROUP BY a.activity_id
-    HAVING COUNT(s.student_id)>=a.activity_max_particp_count
-  )THEN
-    RASIE EXCEPTION 'activity is alread full';
+  SELECT cnt INTO current_count FROM v_ActivitySignUpCount WHERE activity_id=NEW.activity_id;
+  SELECT activity_max_particp_count INTO max_count FROM Activity WHERE activity_id=NEW.activity_id;
+  IF (current_count>=max_count) THEN
+    RAISE EXCEPTION 'activity is alread full';
+  END IF;
   
   IF EXISTS (
-    SELECT 1 FROM SignUp s JOIN Activity a ON s.activity_id=a.activity_id
-    WHERE  s.student_id=NEW.student_id AND (a.activity_start_time,a.activity_end_time)
-    OVERLAPS(SELECT activity_start_time,activity_end_time FROM Activity WHERE activity_id=NEW.activity_id)
-  )THEN
+    SELECT 1 FROM SignUp s 
+    JOIN Activity a ON s.activity_id=a.activity_id
+    WHERE s.student_id=NEW.student_id AND (
+      (a.activity_start_time, a.activity_end_time) OVERLAPS (
+        SELECT activity_start_time, activity_end_time FROM Activity
+        WHERE activity_id=NEW.activity_id
+      )
+    )
+  ) THEN
     RAISE EXCEPTION 'time conflict with other activities';
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -65,10 +76,11 @@ EXECUTE PROCEDURE tf_initiatecheckin_insert_check_activity_state();
 
 CREATE OR REPLACE FUNCTION tf_initiatecheckin_insert_update_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-  IF EXISTS(
-    SELECT 1 FROM Activity WHERE activity_id=NEW.activity_id AND activity_state=1
-  )THEN
-    UPDATE Activity SET activity_state=2
+  IF EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id=NEW.activity_id AND activity_state=0
+  ) THEN
+    UPDATE Activity SET activity_state=1
     WHERE activity_id=NEW.activity_id;
   RETURN NEW;
 END;
