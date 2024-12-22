@@ -116,7 +116,7 @@
         * 该签退密令与提供密令相符
      2. 插入相应数据
   3. 若成功进行至少一次插入, 则返回`okay_ = TRUE`
-* 审核 (`p_signup(auditor_id_ INTEGER, activity_id_ INTEGER, audition_comment_ VARCHAR, audition_passed_ BOOL, OUT okay_ BOOL, OUT msg_ VARCHAR)`)
+* 审核 (`p_audit(auditor_id_ INTEGER, activity_id_ INTEGER, audition_comment_ VARCHAR, audition_passed_ BOOL, OUT okay_ BOOL, OUT msg_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 当前活动是否处于已开始签退状态
   2. 插入相应数据

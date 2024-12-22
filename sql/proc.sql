@@ -50,7 +50,7 @@ BEGIN
   RAISE EXCEPTION 'not implemented';
 END;
 
-CREATE OR REPLACE PROCEDURE p_audit_signup(
+CREATE OR REPLACE PROCEDURE p_audit(
   auditor_id_ INTEGER,
   activity_id_ INTEGER,
   audition_comment_ VARCHAR,
