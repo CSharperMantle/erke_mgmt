@@ -42,8 +42,10 @@
   * 提供每项活动的评分人数、评分均值、最高分与最低分
 * 活动报名人数 (`v_ActivitySignUpCount(activity_id INT4, cnt INT4)`)
   * 提供每项活动的报名人数
-* 开放活动 (`v_AvailActivity(student_id INT4, activity_id INT4)`)
-  * 根据学生年级信息筛选对该生开放的活动
+* 开放活动 (`v_AvailActivity(activity_id INT4)`, `SESSION_USER`相关)
+  * 根据当前登录学生年级信息筛选对该生开放的活动
+* 缺席活动 (`v_NonParticipActivity(activity_id INT4)`, `SESSION_USER`相关)
+  * 筛选已开始签退但当前登录学生尚未签到的活动
 
 ## 索引列
 
@@ -132,3 +134,7 @@
   3. 返回`okay_ = TRUE`
 * 随机数生成 (`f_gen_random_checkinout_code() RETURNS VARCHAR`)
   1. 生成8位伪随机字母数字串, 返回
+* 判断登录用户是否符合 (`f_check_session_user_is(type_ VARCHAR, uid_ VARCHAR) RETURNS BOOL`)
+  1. 如果当前登录用户为`erke_admin`, 则返回`TRUE`
+  2. 如果当前登录用户为`erke_<type_>_<uid_>`, 则返回`TRUE`
+  3. 否则返回`FALSE`
