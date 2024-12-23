@@ -46,7 +46,9 @@ BEGIN
     SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM SignUp s
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE (
-      f_check_session_user_is('student', s.student_id) AND EXISTS (
+      a.activity_state=1
+      AND f_check_session_user_is('student', s.student_id)
+      AND EXISTS (
         SELECT 1 FROM InitiateCheckIn i
         WHERE (
           (i.activity_id=s.activity_id)
