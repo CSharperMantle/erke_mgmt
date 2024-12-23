@@ -81,3 +81,16 @@ BEGIN
   RETURN LPAD(ABS((('x' || LEFT(MD5(salt || CURRENT_TIMESTAMP), 8))::BIT(32)::INT4 % 100000000)::TEXT), 8, '0');
 END;
 $$ LANGUAGE plpgsql;
+
+CREATE OR REPLACE FUNCTION f_check_session_user_is(type_ VARCHAR, uid_ VARCHAR)
+RETURNS BOOLEAN AS $$
+DECLARE
+  matches VARCHAR[];
+BEGIN
+  IF (SESSION_USER='erke_admin') THEN
+    RETURN TRUE;
+  END IF;
+  matches := regexp_matches(SESSION_USER, '^erke_(auditor|student|organizer)_([0-9]+)$');
+  RETURN ((matches IS NOT NULL) AND (array_length(matches, 1)=2) AND (matches[1]=type_) AND (matches[2]=uid_));
+END;
+$$ LANGUAGE plpgsql;
