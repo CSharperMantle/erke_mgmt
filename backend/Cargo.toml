@@ -1,0 +1,10 @@
+[package]
+name = "backend"
+version = "0.1.0"
+edition = "2021"
+
+[dependencies]
+rocket = "0.5.1"
+dotenvy = "0.15"
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "tls-native-tls", "postgres", "macros" ] }
+rocket_db_pools = { version = "0.2.0", features = [ "sqlx_postgres" ] }
