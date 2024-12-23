@@ -18,5 +18,13 @@ CREATE VIEW v_AvailActivity AS
 
 DROP VIEW IF EXISTS v_NonParticipActivity;
 CREATE VIEW v_NonParticipActivity AS
-  SELECT
-    NULL::INT4 AS activity_id;
+  SELECT s.activity_id AS activity_id FROM SignUp s
+  INNER JOIN Activity a ON s.activity_id=a.activity_id
+  WHERE (
+    s.activity_state=2
+    AND f_check_session_user_is('student', s.student_id)
+    AND NOT EXISTS (
+      SELECT 1 FROM DoCheckIn d
+      WHERE d.activity_id=s.activity_id AND d.student_id=s.student_id
+    )
+  );
