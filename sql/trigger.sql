@@ -75,6 +75,7 @@ CREATE TRIGGER t_audit_insert_check_activity_state BEFORE INSERT
 ON "Audit" FOR EACH ROW
 EXECUTE PROCEDURE tf_audit_insert_check_activity_state();
 
+--- 111
 CREATE OR REPLACE FUNCTION tf_audit_insert_update_activity_state() RETURNS TRIGGER AS $$
 BEGIN
   RAISE WARNING 'not implemented';
