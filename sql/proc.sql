@@ -70,7 +70,17 @@ CREATE OR REPLACE PROCEDURE p_rate(
   OUT msg_ VARCHAR) AS
 DECLARE
 BEGIN
-  RAISE EXCEPTION 'not implemented';
+  okay_ := FALSE;
+  IF NOT EXISTS (
+    SELECT 1 FROM DoCheckOut
+    WHERE student_id=student_id_ AND activity_id=activity_id_
+  ) THEN
+    msg_ := 'you must check out before rating';
+    RETURN;
+  END IF;
+  INSERT INTO Rate(student_id, activity_id, rate_value) VALUES (student_id_, activity_id_, rate_value_);
+  okay_ := TRUE;
+  msg_ := '';
 END;
 
 CREATE OR REPLACE FUNCTION f_gen_random_checkinout_code()
