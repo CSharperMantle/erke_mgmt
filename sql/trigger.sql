@@ -75,10 +75,12 @@ CREATE TRIGGER t_audit_insert_check_activity_state BEFORE INSERT
 ON "Audit" FOR EACH ROW
 EXECUTE PROCEDURE tf_audit_insert_check_activity_state();
 
---- 111
 CREATE OR REPLACE FUNCTION tf_audit_insert_update_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF (NEW.audit_passed==TRUE) THEN
+    UPDATE Activity SET activity_state=3
+    WHERE activity_id=NEW.activity_id;
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
