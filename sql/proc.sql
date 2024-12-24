@@ -59,7 +59,17 @@ CREATE OR REPLACE PROCEDURE p_audit(
   OUT msg_ VARCHAR) AS
 DECLARE
 BEGIN
-  RAISE EXCEPTION 'not implemented';
+  okay_ := FALSE;
+  IF NOT EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id=activity_id_ AND activity_state=2
+  ) THEN
+    msg_ := 'activity state is invalid';
+    RETURN;
+  END IF;
+  INSERT INTO "Audit"(auditor_id, activity_id, audition_comment, audition_passed) VALUES (auditor_id_, activity_id_, audition_comment_, audition_passed_);
+  okay_ := TRUE;
+  msg_ := '';
 END;
 
 CREATE OR REPLACE PROCEDURE p_rate(
