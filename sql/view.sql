@@ -21,7 +21,7 @@ CREATE VIEW v_AvailActivity AS
   FROM Activity a
   JOIN BeOpenTo b ON a.activity_id=b.activity_id
   JOIN Student s ON b.grade_value=s.grade_value
-  WHERE s.student_id=SESSION_USER
+  WHERE f_check_session_user_is('student', s.student_id)
   AND CURRENT_TIMESTAMP BETWEEN a.activity_signup_start_time AND a.activity_signup_end_time;
 
 
