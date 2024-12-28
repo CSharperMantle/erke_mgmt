@@ -69,20 +69,17 @@ CREATE TRIGGER t_initiatecheckout_insert_update_activity_state AFTER INSERT
 ON InitiateCheckOut FOR EACH ROW
 EXECUTE PROCEDURE tf_initiatecheckout_insert_update_activity_state();
 
-CREATE OR REPLACE FUNCTION tf_audit_insert_check_activity_state() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION t_audit_insert_check_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-    IF NOT EXISTS (
-        SELECT 1 FROM Activity
-        WHERE activity_id = NEW.activity_id AND activity_state = 2
-    ) THEN
-        RAISE EXCEPTION 'The activity is not in the Started check-in state.';
-    END IF;
-    RETURN NEW;
+  IF NOT EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id = NEW.activity_id AND activity_state = 1
+  ) THEN
+    RAISE EXCEPTION 'Activity is not in the check-in state';
+  END IF;
+  RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
-CREATE TRIGGER t_audit_insert_check_activity_state BEFORE INSERT
-ON "Audit" FOR EACH ROW
-EXECUTE PROCEDURE tf_audit_insert_check_activity_state();
 
 CREATE TRIGGER t_audit_insert_check_activity_state BEFORE INSERT
 ON "Audit" FOR EACH ROW
