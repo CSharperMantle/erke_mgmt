@@ -69,7 +69,7 @@ CREATE TRIGGER t_initiatecheckout_insert_update_activity_state AFTER INSERT
 ON InitiateCheckOut FOR EACH ROW
 EXECUTE PROCEDURE tf_initiatecheckout_insert_update_activity_state();
 
-CREATE OR REPLACE FUNCTION t_audit_insert_check_activity_state() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION tf_audit_insert_check_activity_state() RETURNS TRIGGER AS $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
