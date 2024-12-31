@@ -42,13 +42,13 @@ CREATE TRIGGER t_initiatecheckin_insert_update_activity_state AFTER INSERT
 ON InitiateCheckIn FOR EACH ROW
 EXECUTE PROCEDURE tf_initiatecheckin_insert_update_activity_state();
 
-CREATE OR REPLACE FUNCTION t_initiatecheckout_insert_check_activity_state() RETURNS TRIGGER AS $$
+CREATE OR REPLACE FUNCTION tf_initiatecheckout_insert_check_activity_state() RETURNS TRIGGER AS $$
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
-    WHERE activity_id = NEW.activity_id AND activity_state IN (1, 2)
+    WHERE activity_id=NEW.activity_id AND (activity_state IN (1, 2))
   ) THEN
-    RAISE EXCEPTION 'Activity is not in check-in or check-out state';
+    RAISE EXCEPTION 'activity state invalid for check-out';
   END IF;
   RETURN NEW;
 END;
@@ -73,9 +73,9 @@ CREATE OR REPLACE FUNCTION tf_audit_insert_check_activity_state() RETURNS TRIGGE
 BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
-    WHERE activity_id = NEW.activity_id AND activity_state = 1
+    WHERE activity_id=NEW.activity_id AND activity_state=2
   ) THEN
-    RAISE EXCEPTION 'Activity is not in the check-in state';
+    RAISE EXCEPTION 'activity state invalid for audit';
   END IF;
   RETURN NEW;
 END;
