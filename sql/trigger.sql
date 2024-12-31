@@ -173,7 +173,12 @@ EXECUTE PROCEDURE tf_audit_insert_update_activity_state();
 
 CREATE OR REPLACE FUNCTION tf_rate_insert_check() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF NOT EXISTS (
+    SELECT 1 FROM DoCheckOut
+    WHERE student_id=NEW.student_id AND activity_id=NEW.activity_id
+  ) THEN
+  END IF;
+    RAISE EXCEPTION 'student has not signed out in this activity';
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
