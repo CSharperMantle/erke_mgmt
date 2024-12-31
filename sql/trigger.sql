@@ -10,6 +10,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_activity_update_check ON Activity;
 CREATE TRIGGER t_activity_update_check BEFORE UPDATE
 ON Activity FOR EACH ROW
 EXECUTE PROCEDURE tf_activity_update_check();
@@ -63,6 +64,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_signup_insert_check ON SignUp;
 CREATE TRIGGER t_signup_insert_check BEFORE INSERT
 ON SignUp FOR EACH ROW
 EXECUTE PROCEDURE tf_signup_insert_check();
@@ -79,6 +81,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_initiatecheckin_insert_check_activity_state ON InitiateCheckIn;
 CREATE TRIGGER t_initiatecheckin_insert_check_activity_state BEFORE INSERT
 ON InitiateCheckIn FOR EACH ROW
 EXECUTE PROCEDURE tf_initiatecheckin_insert_check_activity_state();
@@ -91,10 +94,12 @@ BEGIN
   ) THEN
     UPDATE Activity SET activity_state=1
     WHERE activity_id=NEW.activity_id;
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_initiatecheckin_insert_update_activity_state ON InitiateCheckIn;
 CREATE TRIGGER t_initiatecheckin_insert_update_activity_state AFTER INSERT
 ON InitiateCheckIn FOR EACH ROW
 EXECUTE PROCEDURE tf_initiatecheckin_insert_update_activity_state();
@@ -111,6 +116,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_initiatecheckout_insert_check_activity_state ON InitiateCheckOut;
 CREATE TRIGGER t_initiatecheckout_insert_check_activity_state BEFORE INSERT
 ON InitiateCheckOut FOR EACH ROW
 EXECUTE PROCEDURE tf_initiatecheckout_insert_check_activity_state();
@@ -128,6 +134,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_initiatecheckout_insert_update_activity_state ON InitiateCheckOut;
 CREATE TRIGGER t_initiatecheckout_insert_update_activity_state AFTER INSERT
 ON InitiateCheckOut FOR EACH ROW
 EXECUTE PROCEDURE tf_initiatecheckout_insert_update_activity_state();
@@ -144,6 +151,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_audit_insert_check_activity_state ON "Audit";
 CREATE TRIGGER t_audit_insert_check_activity_state BEFORE INSERT
 ON "Audit" FOR EACH ROW
 EXECUTE PROCEDURE tf_audit_insert_check_activity_state();
@@ -158,6 +166,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_audit_insert_update_activity_state ON "Audit";
 CREATE TRIGGER t_audit_insert_update_activity_state AFTER INSERT
 ON "Audit" FOR EACH ROW
 EXECUTE PROCEDURE tf_audit_insert_update_activity_state();
@@ -169,6 +178,7 @@ BEGIN
 END;
 $$ LANGUAGE plpgsql;
 
+DROP TRIGGER IF EXISTS t_rate_insert_check ON Rate;
 CREATE TRIGGER t_rate_insert_check BEFORE INSERT
 ON Rate FOR EACH ROW
 EXECUTE PROCEDURE tf_rate_insert_check();
