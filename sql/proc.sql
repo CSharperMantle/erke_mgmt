@@ -53,7 +53,7 @@ BEGIN
         WHERE (
           (i.activity_id=s.activity_id)
           AND (i.initiatecheckin_secret=code_)
-          AND (t BETWEEN i.initiatecheckin_time AND (i.initiatecheckin_time + i.initiatecheckin_valid_duration))
+          AND (t BETWEEN i.initiatecheckin_time AND (i.initiatecheckin_time+i.initiatecheckin_valid_duration))
         )
       )
     )
