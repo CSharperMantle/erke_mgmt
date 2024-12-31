@@ -6,6 +6,8 @@ CREATE OR REPLACE PROCEDURE p_signup(
 DECLARE
   current_count INTEGER;
   max_count INTEGER;
+  new_activity_start TIMESTAMP;
+  new_activity_end TIMESTAMP;
   t TIMESTAMP;
 BEGIN
   okay_ := FALSE;
@@ -21,7 +23,7 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1 FROM Activity
-    WHERE activity_id=NEW.activity_id
+    WHERE activity_id=activity_id_
     AND t BETWEEN activity_sign_up_start_time AND activity_sign_up_end_time
   ) THEN
     msg_ := 'activity is not in the sign-up phase.';
@@ -43,22 +45,17 @@ BEGIN
     RETURN;
   END IF;
 
+  SELECT activity_start_time, activity_end_time INTO new_activity_start, new_activity_end FROM Activity
+  WHERE activity_id=activity_id_;
   IF EXISTS (
-    SELECT 1 FROM SignUp s1
-    INNER JOIN Activity a1 ON s1.activity_id=a1.activity_id
-    CROSS JOIN SignUp s2
-    INNER JOIN Activity a2 ON s2.activity_id=a2.activity_id
-    WHERE (
-      (s1.student_id=NEW.student_id)
-      AND (s1.student_id=s2.student_id)
-      AND (a1.activity_id<>a2.activity_id)
-      AND ((a1.activity_start_time, a1.activity_end_time) OVERLAPS (a2.activity_start_time, a2.activity_end_time))
-    )
+    SELECT 1 FROM SignUp s
+    INNER JOIN Activity a ON s.activity_id=a.activity_id
+    WHERE s.student_id=student_id_ AND ((a.activity_start_time, a.activity_end_time) OVERLAPS (new_activity_start, new_activity_end))
   ) THEN
     msg_ := 'time conflict with other activities';
     RETURN;
   END IF;
-  INSERT INTO SignUp(student_id, activity_id, signup_time) VALUES(student_id_, activity_id_, t);
+  INSERT INTO SignUp(student_id, activity_id, signup_time) VALUES (student_id_, activity_id_, t);
   okay_ := TRUE;
   msg_ := '';
 END;

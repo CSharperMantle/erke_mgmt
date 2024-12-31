@@ -17,6 +17,8 @@ EXECUTE PROCEDURE tf_activity_update_check();
 CREATE OR REPLACE FUNCTION tf_signup_insert_check() RETURNS TRIGGER AS $$
 DECLARE
   current_count INTEGER;
+  new_activity_start TIMESTAMP;
+  new_activity_end TIMESTAMP;
   max_count INTEGER;
 BEGIN
   IF NOT EXISTS (
@@ -48,17 +50,12 @@ BEGIN
     RAISE EXCEPTION 'activity is alread full';
   END IF;
   
+  SELECT activity_start_time, activity_end_time INTO new_activity_start, new_activity_end FROM Activity
+  WHERE activity_id=NEW.activity_id;
   IF EXISTS (
-    SELECT 1 FROM SignUp s1
-    INNER JOIN Activity a1 ON s1.activity_id=a1.activity_id
-    CROSS JOIN SignUp s2
-    INNER JOIN Activity a2 ON s2.activity_id=a2.activity_id
-    WHERE (
-      (s1.student_id=NEW.student_id)
-      AND (s1.student_id=s2.student_id)
-      AND (a1.activity_id<>a2.activity_id)
-      AND ((a1.activity_start_time, a1.activity_end_time) OVERLAPS (a2.activity_start_time, a2.activity_end_time))
-    )
+    SELECT 1 FROM SignUp s
+    INNER JOIN Activity a ON s.activity_id=a.activity_id
+    WHERE s.student_id=NEW.student_id AND ((a.activity_start_time, a.activity_end_time) OVERLAPS (new_activity_start, new_activity_end))
   ) THEN
     RAISE EXCEPTION 'time conflict with other activities';
   END IF;
