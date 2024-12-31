@@ -49,13 +49,15 @@ BEGIN
   END IF;
   
   IF EXISTS (
-    SELECT 1 FROM SignUp s 
-    JOIN Activity a ON s.activity_id=a.activity_id
-    WHERE s.student_id=NEW.student_id AND (
-      (a.activity_start_time, a.activity_end_time) OVERLAPS (
-        SELECT activity_start_time, activity_end_time FROM Activity
-        WHERE activity_id=NEW.activity_id
-      )
+    SELECT 1 FROM SignUp s1
+    INNER JOIN Activity a1 ON s1.activity_id=a1.activity_id
+    CROSS JOIN SignUp s2
+    INNER JOIN Activity a2 ON s2.activity_id=a2.activity_id
+    WHERE (
+      (s1.student_id=NEW.student_id)
+      AND (s1.student_id=s2.student_id)
+      AND (a1.activity_id<>a2.activity_id)
+      AND ((a1.activity_start_time, a1.activity_end_time) OVERLAPS (a2.activity_start_time, a2.activity_end_time))
     )
   ) THEN
     RAISE EXCEPTION 'time conflict with other activities';
