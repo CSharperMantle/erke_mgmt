@@ -6,8 +6,10 @@ CREATE OR REPLACE PROCEDURE p_signup(
 DECLARE
   current_count INTEGER;
   max_count INTEGER;
+  t TIMESTAMP;
 BEGIN
   okay_ := FALSE;
+  t := CURRENT_TIMESTAMP;
   IF NOT EXISTS (
     SELECT 1 FROM BeOpenTo b
     JOIN Student s ON b.grade_value=s.grade_value
@@ -20,7 +22,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id
-    AND CURRENT_TIMESTAMP BETWEEN activity_sign_up_start_time AND activity_sign_up_end_time
+    AND t BETWEEN activity_sign_up_start_time AND activity_sign_up_end_time
   ) THEN
     msg_ := 'activity is not in the sign-up phase.';
     RETURN;
@@ -54,7 +56,7 @@ BEGIN
     msg_ := 'time conflict with other activities';
     RETURN;
   END IF;
-  INSERT INTO SignUp(student_id, activity_id, signup_time) VALUES(student_id_, activity_id_ ,CURRENT_TIMESTAMP);
+  INSERT INTO SignUp(student_id, activity_id, signup_time) VALUES(student_id_, activity_id_, t);
   okay_ := TRUE;
   msg_ := '';
 END;
