@@ -89,7 +89,7 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1 FROM Activity a
-    WHERE a.activity_id=activity_id_ AND a.activity_state IN (0,1)
+    WHERE a.activity_id=activity_id_ AND a.activity_state IN (0, 1)
   ) THEN
     msg_ := 'the activity is not in the check-in period';
     RETURN;
