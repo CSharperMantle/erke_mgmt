@@ -1,6 +1,11 @@
 CREATE OR REPLACE FUNCTION tf_activity_update_check() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF NOT EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id=NEW.activity_id AND CURRENT_TIMESTAMP<activity_signup_start_time
+  ) THEN
+    RAISE EXCEPTION 'activity is already open for signing up';
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -65,7 +70,12 @@ EXECUTE PROCEDURE tf_signup_insert_check();
 
 CREATE OR REPLACE FUNCTION tf_initiatecheckin_insert_check_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF NOT EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id=NEW.activity_id AND CURRENT_TIMESTAMP>=activity_start_time AND (activity_state IN (0, 1))
+  ) THEN
+    RAISE EXCEPTION 'activity state not valid for check-in';
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
