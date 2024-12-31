@@ -113,7 +113,13 @@ EXECUTE PROCEDURE tf_initiatecheckout_insert_check_activity_state();
 
 CREATE OR REPLACE FUNCTION tf_initiatecheckout_insert_update_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF EXISTS (
+    SELECT 1 FROM Activity
+    WHERE activity_id=NEW.activity_id AND activity_state=1
+  ) THEN
+    UPDATE Activity SET activity_state=2
+    WHERE activity_id=NEW.activity_id;
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
@@ -135,7 +141,10 @@ EXECUTE PROCEDURE tf_audit_insert_check_activity_state();
 
 CREATE OR REPLACE FUNCTION tf_audit_insert_update_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-  RAISE WARNING 'not implemented';
+  IF (NEW.audit_passed==TRUE) THEN
+    UPDATE Activity SET activity_state=3
+    WHERE activity_id=NEW.activity_id;
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
