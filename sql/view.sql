@@ -29,9 +29,10 @@ CREATE VIEW v_RatingAgg AS
 DROP VIEW IF EXISTS v_ActivitySignUpCount;
 CREATE VIEW v_ActivitySignUpCount AS
   SELECT
-    s.activity_id AS activity_id, COUNT(s.student_id) AS cnt 
-  FROM SignUp s
-  GROUP BY activity_id;
+    a.activity_id AS activity_id, COUNT(s.student_id) AS cnt
+  FROM Activity a
+  LEFT JOIN SignUp s ON a.activity_id=s.activity_id
+  GROUP BY a.activity_id;
 
 DROP VIEW IF EXISTS v_StudentAvailActivity;
 CREATE VIEW v_StudentAvailActivity AS

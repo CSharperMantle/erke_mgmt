@@ -6,11 +6,13 @@ use sqlx::{types::chrono, Connection, Row};
 pub struct ActivityGet {
     id: Option<i32>,
     organizer_id: String,
+    name: String,
     description: String,
     location: String,
     signup_start_time: i64,
     signup_end_time: i64,
     start_time: i64,
+    end_time: i64,
     max_particp_count: i32,
     state: Option<i32>,
     tags: Vec<i32>,
@@ -42,11 +44,13 @@ pub async fn route_activity_get(
     struct ActivityRow {
         activity_id: i32,
         organizer_id: String,
+        activity_name: String,
         activity_description: String,
         activity_location: String,
         activity_signup_start_time: sqlx::types::chrono::DateTime<chrono::Utc>,
         activity_signup_end_time: sqlx::types::chrono::DateTime<chrono::Utc>,
         activity_start_time: sqlx::types::chrono::DateTime<chrono::Utc>,
+        activity_end_time: sqlx::types::chrono::DateTime<chrono::Utc>,
         activity_max_particp_count: i32,
         activity_state: i32,
     }
@@ -70,11 +74,13 @@ pub async fn route_activity_get(
 SELECT
     a.activity_id,
     a.organizer_id,
+    a.activity_name,
     a.activity_description,
     a.activity_location,
     a.activity_signup_start_time,
     a.activity_signup_end_time,
     a.activity_start_time,
+    a.activity_end_time,
     a.activity_max_particp_count,
     a.activity_state
 FROM Activity a;
@@ -128,11 +134,13 @@ FROM BeOpenTo bo;
             ActivityGet {
                 id: Some(a.activity_id),
                 organizer_id: a.organizer_id.clone(),
+                name: a.activity_name.clone(),
                 description: a.activity_description.clone(),
                 location: a.activity_location.clone(),
                 signup_start_time: a.activity_signup_start_time.timestamp_millis(),
                 signup_end_time: a.activity_signup_end_time.timestamp_millis(),
                 start_time: a.activity_start_time.timestamp_millis(),
+                end_time: a.activity_end_time.timestamp_millis(),
                 max_particp_count: a.activity_max_particp_count,
                 state: Some(a.activity_state),
                 tags,
@@ -150,11 +158,13 @@ FROM BeOpenTo bo;
 #[derive(serde::Deserialize)]
 pub struct ActivityPut {
     organizer_id: String,
+    name: String,
     description: String,
     location: String,
     signup_start_time: i64,
     signup_end_time: i64,
     start_time: i64,
+    end_time: i64,
     max_particp_count: i32,
     tags: Vec<i32>,
     open_to: Vec<i32>,
@@ -194,17 +204,20 @@ pub async fn route_activity_put(
         r##"
 INSERT INTO Activity(
     organizer_id,
+    activity_name,
     activity_description,
     activity_location,
     activity_signup_start_time,
     activity_signup_end_time,
     activity_start_time,
+    activity_end_time,
     activity_max_particp_count
-) VALUES ($1, $2, $3, $4, $5, $6, $7)
+) VALUES ($1, $2, $3, $4, $5, $6, $7, $8, $9)
 RETURNING activity_id;
 "##,
     )
     .bind(&req.data.organizer_id)
+    .bind(&req.data.name)
     .bind(&req.data.description)
     .bind(&req.data.location)
     .bind(chrono::DateTime::from_timestamp_millis(
@@ -214,6 +227,7 @@ RETURNING activity_id;
         req.data.signup_end_time,
     ))
     .bind(chrono::DateTime::from_timestamp_millis(req.data.start_time))
+    .bind(chrono::DateTime::from_timestamp_millis(req.data.end_time))
     .bind(req.data.max_particp_count)
     .fetch_one(&mut *tx)
     .await

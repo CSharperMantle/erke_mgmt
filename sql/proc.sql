@@ -30,7 +30,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=activity_id_
-    AND t BETWEEN activity_sign_up_start_time AND activity_sign_up_end_time
+    AND t BETWEEN activity_signup_start_time AND activity_signup_end_time
   ) THEN
     msg_ := 'activity is not in the sign-up phase.';
     RETURN;
@@ -86,7 +86,7 @@ BEGIN
 
   IF NOT EXISTS (
     SELECT 1 FROM Activity a
-    WHERE a.organizer_id_=organizer_id_ AND a.activity_id=activity_id_
+    WHERE a.organizer_id=organizer_id_ AND a.activity_id=activity_id_
   ) THEN
     msg_ := 'not the same organizer';
     RETURN;

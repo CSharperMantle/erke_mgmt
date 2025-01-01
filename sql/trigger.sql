@@ -33,7 +33,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id
-    AND CURRENT_TIMESTAMP BETWEEN activity_sign_up_start_time AND activity_sign_up_end_time
+    AND CURRENT_TIMESTAMP BETWEEN activity_signup_start_time AND activity_signup_end_time
   ) THEN
     RAISE EXCEPTION 'activity is not in the sign-up phase.';
   END IF;
