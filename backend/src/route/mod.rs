@@ -12,6 +12,9 @@ where
     #[response(status = 403)]
     Forbidden(rocket::serde::json::Json<T>),
 
+    #[response(status = 409)]
+    Conflict(rocket::serde::json::Json<T>),
+
     #[response(status = 422)]
     Invalid(rocket::serde::json::Json<T>),
 
@@ -25,6 +28,12 @@ where
 {
     fn make_forbidden(message: Option<String>) -> Self {
         RouteError::Forbidden(rocket::serde::json::Json(T::from(
+            message.unwrap_or_default(),
+        )))
+    }
+
+    fn make_conflict(message: Option<String>) -> Self {
+        RouteError::Conflict(rocket::serde::json::Json(T::from(
             message.unwrap_or_default(),
         )))
     }
@@ -74,8 +83,17 @@ where
     T: From<String>,
 {
     fn dispatch_err(self) -> Result<R, RouteError<T>> {
+        use sqlx::error::ErrorKind as DbErrorKind;
+        use sqlx::Error as SqlxError;
+
         self.map_err(|e| match e {
-            sqlx::Error::Database(_) => RouteError::make_invalid(Some(e.to_string())),
+            SqlxError::Database(dbe) => match dbe.kind() {
+                DbErrorKind::CheckViolation
+                | DbErrorKind::UniqueViolation
+                | DbErrorKind::ForeignKeyViolation
+                | DbErrorKind::NotNullViolation => RouteError::make_invalid(Some(dbe.to_string())),
+                _ => RouteError::make_conflict(Some(dbe.to_string())),
+            },
             _ => RouteError::make_other(Some(e.to_string())),
         })
     }

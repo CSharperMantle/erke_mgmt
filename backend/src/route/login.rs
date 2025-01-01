@@ -53,6 +53,7 @@ pub async fn route_login(
         .fetch_one(&mut conn)
         .await
         .map_err(|_| LoginError::make_forbidden(Some("no permission to select".to_string())))?;
+    
     conn.close()
         .await
         .map_err(|_| LoginError::make_other(None))?;
