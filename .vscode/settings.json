@@ -4,5 +4,6 @@
         "plaintext": false,
         "markdown": false,
         "scminput": false
-    }
+    },
+    "rust-analyzer.check.command": "clippy"
 }

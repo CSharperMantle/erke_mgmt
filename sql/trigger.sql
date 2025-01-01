@@ -3,7 +3,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id AND CURRENT_TIMESTAMP<activity_signup_start_time
-  ) THEN
+  ) AND OLD.activity_state=NEW.activity_state THEN
     RAISE EXCEPTION 'activity is already open for signing up';
   END IF;
   RETURN NEW;
@@ -18,8 +18,8 @@ EXECUTE PROCEDURE tf_activity_update_check();
 CREATE OR REPLACE FUNCTION tf_signup_insert_check() RETURNS TRIGGER AS $$
 DECLARE
   current_count INTEGER;
-  new_activity_start TIMESTAMP;
-  new_activity_end TIMESTAMP;
+  new_activity_start TIMESTAMP WITH TIME ZONE;
+  new_activity_end TIMESTAMP WITH TIME ZONE;
   max_count INTEGER;
 BEGIN
   IF NOT EXISTS (
@@ -33,7 +33,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id
-    AND CURRENT_TIMESTAMP BETWEEN activity_sign_up_start_time AND activity_sign_up_end_time
+    AND CURRENT_TIMESTAMP BETWEEN activity_signup_start_time AND activity_signup_end_time
   ) THEN
     RAISE EXCEPTION 'activity is not in the sign-up phase.';
   END IF;
@@ -177,8 +177,8 @@ BEGIN
     SELECT 1 FROM DoCheckOut
     WHERE student_id=NEW.student_id AND activity_id=NEW.activity_id
   ) THEN
-  END IF;
     RAISE EXCEPTION 'student has not signed out in this activity';
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;

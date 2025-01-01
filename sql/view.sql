@@ -13,19 +13,26 @@ CREATE VIEW v_OrganizerSelfActivity AS
   SELECT activity_id FROM Activity
   WHERE f_check_session_user_is('organizer', organizer_id);
 
-DROP VIEW IF EXISTS v_RateAgg;
-CREATE VIEW v_RateAgg AS
+DROP VIEW IF EXISTS v_AuditorSelfAudit;
+CREATE VIEW v_AuditorSelfAudit AS
+  SELECT * FROM "Audit"
+  WHERE f_check_session_user_is('auditor', auditor_id);
+
+DROP VIEW IF EXISTS v_RatingAgg;
+CREATE VIEW v_RatingAgg AS
   SELECT
-    r.activity_id AS activity_id, COUNT(r.rate_value) AS rate_cnt, AVG(r.rate_value) AS rate_avg, MAX(r.rate_value) AS rate_max, MIN(r.rate_value) AS rate_min
-  FROM Rate r
-  GROUP BY r.activity_id;
+    a.activity_id AS activity_id, COUNT(r.rate_value) AS rate_cnt, AVG(r.rate_value) AS rate_avg, MAX(r.rate_value) AS rate_max, MIN(r.rate_value) AS rate_min
+  FROM Activity a
+  LEFT JOIN Rate r ON a.activity_id=r.activity_id
+  GROUP BY a.activity_id;
 
 DROP VIEW IF EXISTS v_ActivitySignUpCount;
 CREATE VIEW v_ActivitySignUpCount AS
   SELECT
-    s.activity_id AS activity_id, COUNT(s.student_id) AS cnt 
-  FROM SignUp s
-  GROUP BY activity_id;
+    a.activity_id AS activity_id, COUNT(s.student_id) AS cnt
+  FROM Activity a
+  LEFT JOIN SignUp s ON a.activity_id=s.activity_id
+  GROUP BY a.activity_id;
 
 DROP VIEW IF EXISTS v_StudentAvailActivity;
 CREATE VIEW v_StudentAvailActivity AS

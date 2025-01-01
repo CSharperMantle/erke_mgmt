@@ -14,3 +14,4 @@ Open design files with PowerDesigner.
   * erke_pdm.*: Physical data model (generated from LDM)
 * notes/: Design notes
 * sql/: Handwritten SQL scripts
+* backend/: Server implementation
