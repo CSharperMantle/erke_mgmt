@@ -1,3 +1,18 @@
+DROP VIEW IF EXISTS v_StudentSelfSignUp;
+CREATE VIEW v_StudentSelfSignUp AS
+  SELECT * FROM SignUp
+  WHERE f_check_session_user_is('student', student_id);
+
+DROP VIEW IF EXISTS v_StudentSelfRate;
+CREATE VIEW v_StudentSelfRate AS
+  SELECT * FROM Rate
+  WHERE f_check_session_user_is('student', student_id);
+
+DROP VIEW IF EXISTS v_OrganizerSelfActivity;
+CREATE VIEW v_OrganizerSelfActivity AS
+  SELECT activity_id FROM Activity
+  WHERE f_check_session_user_is('organizer', organizer_id);
+
 DROP VIEW IF EXISTS v_RateAgg;
 CREATE VIEW v_RateAgg AS
   SELECT
@@ -24,11 +39,10 @@ CREATE VIEW v_AvailActivity AS
 
 DROP VIEW IF EXISTS v_NonParticipActivity;
 CREATE VIEW v_NonParticipActivity AS
-  SELECT s.activity_id AS activity_id FROM SignUp s
+  SELECT s.activity_id AS activity_id FROM v_StudentSelfSignUp s
   INNER JOIN Activity a ON s.activity_id=a.activity_id
   WHERE (
     a.activity_state=2
-    AND f_check_session_user_is('student', s.student_id)
     AND NOT EXISTS (
       SELECT 1 FROM DoCheckIn d
       WHERE d.activity_id=s.activity_id AND d.student_id=s.student_id

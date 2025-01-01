@@ -162,11 +162,10 @@ BEGIN
   t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
   FOR v IN (
-    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM SignUp s
+    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM v_StudentSelfSignUp s
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE (
       a.activity_state=1
-      AND f_check_session_user_is('student', s.student_id)
       AND EXISTS (
         SELECT 1 FROM InitiateCheckIn i
         WHERE (
@@ -198,11 +197,10 @@ BEGIN
   t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
   FOR v IN (
-    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM SignUp s
+    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM v_StudentSelfSignUp s
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE (
       a.activity_state=2
-      AND f_check_session_user_is('student', s.student_id)
       AND EXISTS (
         SELECT 1 FROM DoCheckIn dci
         WHERE dci.student_id=s.student_id AND dci.activity_id=s.activity_id

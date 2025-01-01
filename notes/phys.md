@@ -38,14 +38,22 @@
 
 ## 视图
 
+列结构设计原则: 若模式公开, 则仅选出主键; 若模式受限, 则选出所有列. 如: `Activity`查询权限对所有人开放, 则视图`v_AvailActivity`仅选出`activity_id`. 使用时需JOIN.
+
 * 聚合评价 (`v_RateAgg(activity_id INT4, rate_cnt INT4, rate_avg DECIMAL, rate_max DECIMAL, rate_min DECIMAL)`)
   * 提供每项活动的评分人数、评分均值、最高分与最低分
 * 活动报名人数 (`v_ActivitySignUpCount(activity_id INT4, cnt INT4)`)
   * 提供每项活动的报名人数
-* 开放活动 (`v_AvailActivity(activity_id INT4)`, `SESSION_USER`相关)
+* 当前学生开放活动 (`v_AvailActivity(activity_id INT4)`, `SESSION_USER`相关)
   * 根据当前登录学生年级信息筛选对该生开放的活动
-* 缺席活动 (`v_NonParticipActivity(activity_id INT4)`, `SESSION_USER`相关)
+* 当前学生缺席活动 (`v_NonParticipActivity(activity_id INT4)`, `SESSION_USER`相关)
   * 筛选已开始签退但当前登录学生尚未签到的活动
+* 当前学生报名记录 (`v_StudentSelfSignUp` ~ `SignUp`, `SESSION_USER`相关)
+  * 筛选当前学生的报名记录
+* 当前学生评分记录 (`v_StudentSelfRate` ~ `Rate`, `SESSION_USER`相关)
+  * 筛选当前学生的评分记录
+* 当前组织者活动 (`v_OrganizerSelfActivity(activity_id INT4)`, `SESSION_USER`相关)
+  * 筛选当前组织者的活动
 
 ## 索引列
 
