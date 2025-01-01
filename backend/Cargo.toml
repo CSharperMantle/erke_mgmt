@@ -7,5 +7,5 @@ edition = "2021"
 dotenvy_macro = "0.15.7"
 rocket = { version = "0.5.1", features = [ "secrets", "json" ] }
 serde = "1.0.217"
-sqlx = { version = "0.8.2", features = [ "runtime-tokio", "tls-native-tls", "postgres", "macros" ] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "tls-native-tls", "postgres", "macros", "chrono" ] }
 url = "2.5.4"

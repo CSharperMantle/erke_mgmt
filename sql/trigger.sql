@@ -18,8 +18,8 @@ EXECUTE PROCEDURE tf_activity_update_check();
 CREATE OR REPLACE FUNCTION tf_signup_insert_check() RETURNS TRIGGER AS $$
 DECLARE
   current_count INTEGER;
-  new_activity_start TIMESTAMP;
-  new_activity_end TIMESTAMP;
+  new_activity_start TIMESTAMP WITH TIME ZONE;
+  new_activity_end TIMESTAMP WITH TIME ZONE;
   max_count INTEGER;
 BEGIN
   IF NOT EXISTS (

@@ -1,6 +1,8 @@
 use rocket::serde::json::Json;
 use sqlx::Connection;
 
+use super::RouteError;
+
 #[derive(serde::Deserialize)]
 pub struct LoginRequest {
     username: String,
@@ -12,27 +14,13 @@ pub struct LoginResponse {
     message: String,
 }
 
-#[derive(rocket::response::Responder)]
-pub enum LoginError {
-    #[response(status = 403)]
-    Forbidden(Json<LoginResponse>),
-
-    #[response(status = 500)]
-    Other(Json<LoginResponse>),
-}
-
-impl LoginError {
-    fn make_forbidden(s: Option<String>) -> Self {
-        LoginError::Forbidden(Json(LoginResponse {
-            message: s.unwrap_or_default(),
-        }))
-    }
-    fn make_other(s: Option<String>) -> Self {
-        LoginError::Other(Json(LoginResponse {
-            message: s.unwrap_or_default(),
-        }))
+impl From<String> for LoginResponse {
+    fn from(value: String) -> Self {
+        Self { message: value }
     }
 }
+
+type LoginError = RouteError<LoginResponse>;
 
 #[rocket::post("/login", format = "application/json", data = "<req>")]
 pub async fn route_login(
@@ -72,7 +60,7 @@ pub async fn route_login(
     if row.0 == 1 {
         jar.add_private(("db_url", db_url.to_string()));
         Ok(Json(LoginResponse {
-            message: "ok".to_string(),
+            message: Default::default(),
         }))
     } else {
         Err(LoginError::make_other(None))

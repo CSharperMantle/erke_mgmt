@@ -17,6 +17,6 @@ pub async fn route_logout(
     }
     jar.remove_private("db_url");
     Ok(Json(LogoutResponse {
-        message: "ok".to_string(),
+        message: Default::default(),
     }))
 }
