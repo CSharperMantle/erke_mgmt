@@ -74,7 +74,9 @@ CREATE OR REPLACE PROCEDURE p_initiate_checkin(
   OUT msg_ VARCHAR,
   OUT code_ VARCHAR) AS
 DECLARE
+  t TIMESTAMP WITH TIME ZONE;
 BEGIN
+  t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
 
   IF NOT f_check_session_user_is('organizer', organizer_id_) THEN
@@ -92,7 +94,7 @@ BEGIN
 
   IF EXISTS (
     SELECT 1 FROM Activity a
-    WHERE a.activity_id=activity_id_ AND CURRENT_TIMESTAMP<activity_start_time
+    WHERE a.activity_id=activity_id_ AND t<activity_start_time
   ) THEN
     msg_ := 'the activity is not started yet';
     RETURN;
@@ -109,7 +111,7 @@ BEGIN
   INSERT INTO InitiateCheckIn (
     organizer_id, activity_id, initiatecheckin_time, initiatecheckin_secret, initiatecheckin_valid_duration
   ) VALUES (
-    organizer_id_, activity_id_, CURRENT_TIMESTAMP, code_, valid_duration_
+    organizer_id_, activity_id_, t, code_, valid_duration_
   );
   okay_ := TRUE;
   msg_ := '';
