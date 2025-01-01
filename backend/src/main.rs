@@ -22,7 +22,11 @@ fn rocket() -> _ {
         )
         .mount(
             "/api/auditor",
-            rocket::routes![route::activity::route_activity_get],
+            rocket::routes![
+                route::activity::route_activity_get,
+                route::audit::route_my_audit_get,
+                route::audit::route_my_audit_put
+            ],
         )
         .mount(
             "/",

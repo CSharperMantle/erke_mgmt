@@ -1,4 +1,5 @@
 pub mod activity;
+pub mod audit;
 pub mod login;
 pub mod logout;
 
@@ -40,23 +41,41 @@ where
     }
 }
 
-async fn try_authenticate<T>(jar: &rocket::http::CookieJar<'_>) -> Result<sqlx::postgres::PgConnection, RouteError<T>>
+async fn try_authenticate<T>(
+    jar: &rocket::http::CookieJar<'_>,
+) -> Result<sqlx::postgres::PgConnection, RouteError<T>>
 where
-    T: From<String>
+    T: From<String>,
 {
     use sqlx::Connection;
     type E<T> = RouteError<T>;
 
     let db_url = jar
         .get_private("db_url")
-        .ok_or(E::make_forbidden(Some(
-            "not logged in".to_string(),
-        )))?
+        .ok_or(E::make_forbidden(Some("not logged in".to_string())))?
         .value()
         .to_string();
     let conn = sqlx::postgres::PgConnection::connect(&db_url)
         .await
-        .map_err(|e| E::make_other(Some(e.to_string())))?;
-
+        .dispatch_err()?;
     Ok(conn)
+}
+
+trait DispatchSqlxError<R, T>
+where
+    T: From<String>,
+{
+    fn dispatch_err(self) -> Result<R, RouteError<T>>;
+}
+
+impl<R, T> DispatchSqlxError<R, T> for Result<R, sqlx::Error>
+where
+    T: From<String>,
+{
+    fn dispatch_err(self) -> Result<R, RouteError<T>> {
+        self.map_err(|e| match e {
+            sqlx::Error::Database(_) => RouteError::make_invalid(Some(e.to_string())),
+            _ => RouteError::make_other(Some(e.to_string())),
+        })
+    }
 }

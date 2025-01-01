@@ -1,4 +1,4 @@
-use super::{try_authenticate, RouteError};
+use super::{try_authenticate, RouteError, DispatchSqlxError};
 use rocket::serde::json::Json;
 use sqlx::{types::chrono, Connection, Row};
 
@@ -82,7 +82,7 @@ FROM Activity a;
     )
     .fetch_all(&mut conn)
     .await
-    .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
+    .dispatch_err()?;
 
     let be_tagged_rows = sqlx::query_as::<sqlx::postgres::Postgres, BeTaggedRow>(
         r##"
@@ -94,7 +94,7 @@ FROM BeTagged bt;
     )
     .fetch_all(&mut conn)
     .await
-    .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
+    .dispatch_err()?;
 
     let be_open_to_rows = sqlx::query_as::<sqlx::postgres::Postgres, BeOpenToRow>(
         r##"
@@ -106,11 +106,11 @@ FROM BeOpenTo bo;
     )
     .fetch_all(&mut conn)
     .await
-    .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
+    .dispatch_err()?;
 
     conn.close()
         .await
-        .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
+        .dispatch_err()?;
 
     let activities = activity_rows
         .iter()
@@ -188,7 +188,7 @@ pub async fn route_activity_put(
     let mut tx = conn
         .begin()
         .await
-        .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
+        .dispatch_err()?;
 
     let result = sqlx::query(
         r##"
@@ -217,11 +217,11 @@ RETURNING activity_id;
     .bind(req.data.max_particp_count)
     .fetch_one(&mut *tx)
     .await
-    .map_err(|e| ActivityPutError::make_invalid(Some(e.to_string())))?;
+    .dispatch_err()?;
 
     let row_id: i32 = result
         .try_get("activity_id")
-        .map_err(|e| ActivityPutError::make_other(Some(e.to_string())))?;
+        .dispatch_err()?;
     for tag_id in req.data.tags.iter() {
         sqlx::query(
             r##"
@@ -235,7 +235,7 @@ INSERT INTO BeTagged(
         .bind(row_id)
         .execute(&mut *tx)
         .await
-        .map_err(|e| ActivityPutError::make_invalid(Some(e.to_string())))?;
+        .dispatch_err()?;
     }
     for grade_value in req.data.open_to.iter() {
         sqlx::query(
@@ -250,16 +250,16 @@ INSERT INTO BeOpenTo(
         .bind(row_id)
         .execute(&mut *tx)
         .await
-        .map_err(|e| ActivityPutError::make_invalid(Some(e.to_string())))?;
+        .dispatch_err()?;
     }
 
     tx.commit()
         .await
-        .map_err(|e| ActivityPutError::make_other(Some(e.to_string())))?;
+        .dispatch_err()?;
 
     conn.close()
         .await
-        .map_err(|e| ActivityPutError::make_other(Some(e.to_string())))?;
+        .dispatch_err()?;
 
     Ok(Json(ActivityPutResponse {
         message: Default::default(),
