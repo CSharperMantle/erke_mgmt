@@ -50,6 +50,11 @@ pub async fn route_login(
     db_url
         .set_host(Some(dotenvy_macro::dotenv!("DB_HOST")))
         .map_err(|_| LoginError::make_other(None))?;
+    db_url
+        .set_port(Some(
+            dotenvy_macro::dotenv!("DB_PORT").parse::<u16>().unwrap(),
+        ))
+        .map_err(|_| LoginError::make_other(None))?;
     let mut conn = sqlx::postgres::PgConnection::connect(db_url.as_str())
         .await
         .map_err(|e| match e {
@@ -63,12 +68,13 @@ pub async fn route_login(
     conn.close()
         .await
         .map_err(|_| LoginError::make_other(None))?;
+
     if row.0 == 1 {
         jar.add_private(("db_url", db_url.to_string()));
-        return Ok(Json(LoginResponse {
+        Ok(Json(LoginResponse {
             message: "ok".to_string(),
-        }));
+        }))
     } else {
-        return Err(LoginError::make_other(None));
+        Err(LoginError::make_other(None))
     }
 }
