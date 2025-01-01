@@ -45,7 +45,7 @@ pub async fn route_my_audit_get(
 
     let audits = sqlx::query_as::<sqlx::postgres::Postgres, AuditRow>(
         r##"
-SELECT * FROM v_AuditorSelfAudit;
+SELECT audit_id, auditor_id, activity_id, audit_comment, audit_passed FROM v_AuditorSelfAudit;
 "##,
     )
     .fetch_all(&mut conn)
