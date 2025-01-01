@@ -21,9 +21,10 @@ CREATE VIEW v_AuditorSelfAudit AS
 DROP VIEW IF EXISTS v_RatingAgg;
 CREATE VIEW v_RatingAgg AS
   SELECT
-    r.activity_id AS activity_id, COUNT(r.rate_value) AS rate_cnt, AVG(r.rate_value) AS rate_avg, MAX(r.rate_value) AS rate_max, MIN(r.rate_value) AS rate_min
-  FROM Rate r
-  GROUP BY r.activity_id;
+    a.activity_id AS activity_id, COUNT(r.rate_value) AS rate_cnt, AVG(r.rate_value) AS rate_avg, MAX(r.rate_value) AS rate_max, MIN(r.rate_value) AS rate_min
+  FROM Activity a
+  LEFT JOIN Rate r ON a.activity_id=r.activity_id
+  GROUP BY a.activity_id;
 
 DROP VIEW IF EXISTS v_ActivitySignUpCount;
 CREATE VIEW v_ActivitySignUpCount AS
