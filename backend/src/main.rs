@@ -11,13 +11,19 @@ fn rocket() -> _ {
         )
         .mount(
             "/api/student",
-            rocket::routes![route::activity::route_activity_get],
+            rocket::routes![
+                route::activity::route_activity_get,
+                route::rate::route_rating_agg_get,
+                route::rate::route_my_rate_get,
+                route::rate::route_my_rate_put,
+            ],
         )
         .mount(
             "/api/organizer",
             rocket::routes![
                 route::activity::route_activity_get,
-                route::activity::route_activity_put
+                route::activity::route_activity_put,
+                route::rate::route_rating_agg_get
             ],
         )
         .mount(
@@ -25,7 +31,8 @@ fn rocket() -> _ {
             rocket::routes![
                 route::activity::route_activity_get,
                 route::audit::route_my_audit_get,
-                route::audit::route_my_audit_put
+                route::audit::route_my_audit_put,
+                route::rate::route_rating_agg_get
             ],
         )
         .mount(
