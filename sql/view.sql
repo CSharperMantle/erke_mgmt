@@ -27,8 +27,8 @@ CREATE VIEW v_ActivitySignUpCount AS
   FROM SignUp s
   GROUP BY activity_id;
 
-DROP VIEW IF EXISTS v_AvailActivity;
-CREATE VIEW v_AvailActivity AS
+DROP VIEW IF EXISTS v_StudentAvailActivity;
+CREATE VIEW v_StudentAvailActivity AS
   SELECT
     a.activity_id AS activity_id
   FROM Activity a
@@ -37,8 +37,8 @@ CREATE VIEW v_AvailActivity AS
   WHERE f_check_session_user_is('student', s.student_id)
   AND CURRENT_TIMESTAMP BETWEEN a.activity_signup_start_time AND a.activity_signup_end_time;
 
-DROP VIEW IF EXISTS v_NonParticipActivity;
-CREATE VIEW v_NonParticipActivity AS
+DROP VIEW IF EXISTS v_StudentNonParticipActivity;
+CREATE VIEW v_StudentNonParticipActivity AS
   SELECT s.activity_id AS activity_id FROM v_StudentSelfSignUp s
   INNER JOIN Activity a ON s.activity_id=a.activity_id
   WHERE (
