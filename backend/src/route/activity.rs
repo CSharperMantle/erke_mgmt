@@ -1,4 +1,4 @@
-use super::{try_authenticate, RouteError, DispatchSqlxError};
+use super::{try_authenticate, DispatchSqlxError, RouteError};
 use rocket::serde::json::Json;
 use sqlx::{types::chrono, Connection, Row};
 
@@ -114,9 +114,7 @@ FROM BeOpenTo bo;
     .await
     .dispatch_err()?;
 
-    conn.close()
-        .await
-        .dispatch_err()?;
+    conn.close().await.dispatch_err()?;
 
     let activities = activity_rows
         .iter()
@@ -152,6 +150,92 @@ FROM BeOpenTo bo;
     Ok(Json(ActivityGetResponse {
         message: Default::default(),
         data: Some(activities),
+    }))
+}
+
+#[derive(serde::Serialize, sqlx::FromRow)]
+pub struct AvailableActivityGet {
+    activity_id: i32,
+}
+
+#[derive(serde::Serialize)]
+pub struct AvailableActivityGetResponse {
+    message: String,
+    data: Option<Vec<AvailableActivityGet>>,
+}
+
+impl From<String> for AvailableActivityGetResponse {
+    fn from(value: String) -> Self {
+        Self {
+            message: value,
+            data: None,
+        }
+    }
+}
+
+type AvailableActivityGetError = RouteError<AvailableActivityGetResponse>;
+
+#[rocket::get("/available_activity")]
+pub async fn route_available_activity_get(
+    jar: &rocket::http::CookieJar<'_>,
+) -> Result<Json<AvailableActivityGetResponse>, AvailableActivityGetError> {
+    let mut conn = try_authenticate(jar).await?;
+
+    let data = sqlx::query_as::<sqlx::postgres::Postgres, AvailableActivityGet>(
+        r##"
+SELECT activity_id FROM v_StudentAvailActivity;
+"##,
+    )
+    .fetch_all(&mut conn)
+    .await
+    .dispatch_err()?;
+
+    Ok(Json(AvailableActivityGetResponse {
+        message: Default::default(),
+        data: Some(data),
+    }))
+}
+
+#[derive(serde::Serialize, sqlx::FromRow)]
+pub struct NonParticipActivityGet {
+    activity_id: i32,
+}
+
+#[derive(serde::Serialize)]
+pub struct NonParticipActivityGetResponse {
+    message: String,
+    data: Option<Vec<NonParticipActivityGet>>,
+}
+
+impl From<String> for NonParticipActivityGetResponse {
+    fn from(value: String) -> Self {
+        Self {
+            message: value,
+            data: None,
+        }
+    }
+}
+
+type NonParticipActivityGetError = RouteError<NonParticipActivityGetResponse>;
+
+#[rocket::get("/non_particip_activity")]
+pub async fn route_non_particip_activity_get(
+    jar: &rocket::http::CookieJar<'_>,
+) -> Result<Json<NonParticipActivityGetResponse>, NonParticipActivityGetError> {
+    let mut conn = try_authenticate(jar).await?;
+
+    let data = sqlx::query_as::<sqlx::postgres::Postgres, NonParticipActivityGet>(
+        r##"
+SELECT activity_id FROM v_StudentNonParticipActivity;
+"##,
+    )
+    .fetch_all(&mut conn)
+    .await
+    .dispatch_err()?;
+
+    Ok(Json(NonParticipActivityGetResponse {
+        message: Default::default(),
+        data: Some(data),
     }))
 }
 
@@ -195,10 +279,7 @@ pub async fn route_activity_put(
 ) -> Result<Json<ActivityPutResponse>, ActivityPutError> {
     let mut conn = try_authenticate(jar).await?;
 
-    let mut tx = conn
-        .begin()
-        .await
-        .dispatch_err()?;
+    let mut tx = conn.begin().await.dispatch_err()?;
 
     let result = sqlx::query(
         r##"
@@ -233,9 +314,7 @@ RETURNING activity_id;
     .await
     .dispatch_err()?;
 
-    let row_id: i32 = result
-        .try_get("activity_id")
-        .dispatch_err()?;
+    let row_id: i32 = result.try_get("activity_id").dispatch_err()?;
     for tag_id in req.data.tags.iter() {
         sqlx::query(
             r##"
@@ -267,13 +346,9 @@ INSERT INTO BeOpenTo(
         .dispatch_err()?;
     }
 
-    tx.commit()
-        .await
-        .dispatch_err()?;
+    tx.commit().await.dispatch_err()?;
 
-    conn.close()
-        .await
-        .dispatch_err()?;
+    conn.close().await.dispatch_err()?;
 
     Ok(Json(ActivityPutResponse {
         message: Default::default(),

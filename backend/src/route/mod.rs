@@ -6,6 +6,7 @@ pub mod login;
 pub mod logout;
 pub mod rate;
 pub mod signup;
+pub mod tag;
 
 #[derive(rocket::response::Responder)]
 pub enum RouteError<T>
