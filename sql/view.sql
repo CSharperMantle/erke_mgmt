@@ -13,6 +13,11 @@ CREATE VIEW v_OrganizerSelfActivity AS
   SELECT activity_id FROM Activity
   WHERE f_check_session_user_is('organizer', organizer_id);
 
+DROP VIEW IF EXISTS v_AuditorSelfAudit;
+CREATE VIEW v_AuditorSelfAudit AS
+  SELECT * FROM "Audit"
+  WHERE f_check_session_user_is('auditor', auditor_id);
+
 DROP VIEW IF EXISTS v_RateAgg;
 CREATE VIEW v_RateAgg AS
   SELECT

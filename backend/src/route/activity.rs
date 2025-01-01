@@ -3,7 +3,7 @@ use rocket::serde::json::Json;
 use sqlx::{types::chrono, Connection, Row};
 
 #[derive(serde::Serialize)]
-pub struct Activity {
+pub struct ActivityGet {
     id: Option<i32>,
     organizer_id: String,
     description: String,
@@ -18,12 +18,12 @@ pub struct Activity {
 }
 
 #[derive(serde::Serialize)]
-pub struct ActivitiesResponse {
+pub struct ActivityGetResponse {
     message: String,
-    data: Option<Vec<Activity>>,
+    data: Option<Vec<ActivityGet>>,
 }
 
-impl From<String> for ActivitiesResponse {
+impl From<String> for ActivityGetResponse {
     fn from(value: String) -> Self {
         Self {
             message: value,
@@ -32,11 +32,12 @@ impl From<String> for ActivitiesResponse {
     }
 }
 
-type ActivitiesError = RouteError<ActivitiesResponse>;
-#[rocket::get("/activities")]
-pub async fn route_activities_get(
+type ActivityGetError = RouteError<ActivityGetResponse>;
+
+#[rocket::get("/activity")]
+pub async fn route_activity_get(
     jar: &rocket::http::CookieJar<'_>,
-) -> Result<Json<ActivitiesResponse>, ActivitiesError> {
+) -> Result<Json<ActivityGetResponse>, ActivityGetError> {
     #[derive(sqlx::FromRow)]
     struct ActivityRow {
         activity_id: i32,
@@ -81,7 +82,7 @@ FROM Activity a;
     )
     .fetch_all(&mut conn)
     .await
-    .map_err(|e| ActivitiesError::make_other(Some(e.to_string())))?;
+    .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
 
     let be_tagged_rows = sqlx::query_as::<sqlx::postgres::Postgres, BeTaggedRow>(
         r##"
@@ -93,7 +94,7 @@ FROM BeTagged bt;
     )
     .fetch_all(&mut conn)
     .await
-    .map_err(|e| ActivitiesError::make_other(Some(e.to_string())))?;
+    .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
 
     let be_open_to_rows = sqlx::query_as::<sqlx::postgres::Postgres, BeOpenToRow>(
         r##"
@@ -105,11 +106,11 @@ FROM BeOpenTo bo;
     )
     .fetch_all(&mut conn)
     .await
-    .map_err(|e| ActivitiesError::make_other(Some(e.to_string())))?;
+    .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
 
     conn.close()
         .await
-        .map_err(|e| ActivitiesError::make_other(Some(e.to_string())))?;
+        .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
 
     let activities = activity_rows
         .iter()
@@ -124,7 +125,7 @@ FROM BeOpenTo bo;
                 .filter(|bo| bo.activity_id == a.activity_id)
                 .map(|bo| bo.grade_value)
                 .collect();
-            Activity {
+            ActivityGet {
                 id: Some(a.activity_id),
                 organizer_id: a.organizer_id.clone(),
                 description: a.activity_description.clone(),
@@ -140,7 +141,7 @@ FROM BeOpenTo bo;
         })
         .collect();
 
-    Ok(Json(ActivitiesResponse {
+    Ok(Json(ActivityGetResponse {
         message: Default::default(),
         data: Some(activities),
     }))
@@ -175,7 +176,7 @@ impl From<String> for ActivityPutResponse {
     }
 }
 
-type ActivityPutError = RouteError<ActivitiesResponse>;
+type ActivityPutError = RouteError<ActivityGetResponse>;
 
 #[rocket::put("/activity", format = "application/json", data = "<req>")]
 pub async fn route_activity_put(
@@ -187,7 +188,7 @@ pub async fn route_activity_put(
     let mut tx = conn
         .begin()
         .await
-        .map_err(|e| ActivitiesError::make_other(Some(e.to_string())))?;
+        .map_err(|e| ActivityGetError::make_other(Some(e.to_string())))?;
 
     let result = sqlx::query(
         r##"
