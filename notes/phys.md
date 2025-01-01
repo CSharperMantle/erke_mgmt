@@ -46,7 +46,7 @@
   * 筛选当前学生的评分记录
 * 当前组织者活动 (`v_OrganizerSelfActivity(activity_id INT4)`, `SESSION_USER`相关)
   * 筛选当前组织者的活动
-* 聚合评价 (`v_RateAgg(activity_id INT4, rate_cnt INT4, rate_avg DECIMAL, rate_max DECIMAL, rate_min DECIMAL)`)
+* 聚合评价 (`v_RatingAgg(activity_id INT4, rate_cnt INT4, rate_avg DECIMAL, rate_max DECIMAL, rate_min DECIMAL)`)
   * 提供每项活动的评分人数、评分均值、最高分与最低分
 * 活动报名人数 (`v_ActivitySignUpCount(activity_id INT4, cnt INT4)`)
   * 提供每项活动的报名人数

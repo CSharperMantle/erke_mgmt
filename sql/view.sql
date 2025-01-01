@@ -18,8 +18,8 @@ CREATE VIEW v_AuditorSelfAudit AS
   SELECT * FROM "Audit"
   WHERE f_check_session_user_is('auditor', auditor_id);
 
-DROP VIEW IF EXISTS v_RateAgg;
-CREATE VIEW v_RateAgg AS
+DROP VIEW IF EXISTS v_RatingAgg;
+CREATE VIEW v_RatingAgg AS
   SELECT
     r.activity_id AS activity_id, COUNT(r.rate_value) AS rate_cnt, AVG(r.rate_value) AS rate_avg, MAX(r.rate_value) AS rate_max, MIN(r.rate_value) AS rate_min
   FROM Rate r
