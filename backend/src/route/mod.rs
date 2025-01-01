@@ -10,6 +10,9 @@ where
     #[response(status = 403)]
     Forbidden(rocket::serde::json::Json<T>),
 
+    #[response(status = 422)]
+    Invalid(rocket::serde::json::Json<T>),
+
     #[response(status = 500)]
     Other(rocket::serde::json::Json<T>),
 }
@@ -23,6 +26,13 @@ where
             message.unwrap_or_default(),
         )))
     }
+
+    fn make_invalid(message: Option<String>) -> Self {
+        RouteError::Invalid(rocket::serde::json::Json(T::from(
+            message.unwrap_or_default(),
+        )))
+    }
+
     fn make_other(message: Option<String>) -> Self {
         RouteError::Other(rocket::serde::json::Json(T::from(
             message.unwrap_or_default(),

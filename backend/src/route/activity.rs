@@ -2,7 +2,7 @@ use super::{try_authenticate, RouteError};
 use rocket::serde::json::Json;
 use sqlx::{types::chrono, Connection, Row};
 
-#[derive(serde::Serialize, serde::Deserialize)]
+#[derive(serde::Serialize)]
 pub struct Activity {
     id: Option<i32>,
     organizer_id: String,
@@ -147,8 +147,21 @@ FROM BeOpenTo bo;
 }
 
 #[derive(serde::Deserialize)]
+pub struct ActivityPut {
+    organizer_id: String,
+    description: String,
+    location: String,
+    signup_start_time: i64,
+    signup_end_time: i64,
+    start_time: i64,
+    max_particp_count: i32,
+    tags: Vec<i32>,
+    open_to: Vec<i32>,
+}
+
+#[derive(serde::Deserialize)]
 pub struct ActivityPutRequest {
-    activity: Activity,
+    data: ActivityPut,
 }
 
 #[derive(serde::Serialize)]
@@ -190,27 +203,25 @@ INSERT INTO Activity(
 RETURNING activity_id;
 "##,
     )
-    .bind(&req.activity.organizer_id)
-    .bind(&req.activity.description)
-    .bind(&req.activity.location)
+    .bind(&req.data.organizer_id)
+    .bind(&req.data.description)
+    .bind(&req.data.location)
     .bind(chrono::DateTime::from_timestamp_millis(
-        req.activity.signup_start_time,
+        req.data.signup_start_time,
     ))
     .bind(chrono::DateTime::from_timestamp_millis(
-        req.activity.signup_end_time,
+        req.data.signup_end_time,
     ))
-    .bind(chrono::DateTime::from_timestamp_millis(
-        req.activity.start_time,
-    ))
-    .bind(req.activity.max_particp_count)
+    .bind(chrono::DateTime::from_timestamp_millis(req.data.start_time))
+    .bind(req.data.max_particp_count)
     .fetch_one(&mut *tx)
     .await
-    .map_err(|e| ActivityPutError::make_other(Some(e.to_string())))?;
+    .map_err(|e| ActivityPutError::make_invalid(Some(e.to_string())))?;
 
     let row_id: i32 = result
         .try_get("activity_id")
         .map_err(|e| ActivityPutError::make_other(Some(e.to_string())))?;
-    for tag_id in req.activity.tags.iter() {
+    for tag_id in req.data.tags.iter() {
         sqlx::query(
             r##"
 INSERT INTO BeTagged(
@@ -223,9 +234,9 @@ INSERT INTO BeTagged(
         .bind(row_id)
         .execute(&mut *tx)
         .await
-        .map_err(|e| ActivityPutError::make_other(Some(e.to_string())))?;
+        .map_err(|e| ActivityPutError::make_invalid(Some(e.to_string())))?;
     }
-    for grade_value in req.activity.open_to.iter() {
+    for grade_value in req.data.open_to.iter() {
         sqlx::query(
             r##"
 INSERT INTO BeOpenTo(
@@ -238,7 +249,7 @@ INSERT INTO BeOpenTo(
         .bind(row_id)
         .execute(&mut *tx)
         .await
-        .map_err(|e| ActivityPutError::make_other(Some(e.to_string())))?;
+        .map_err(|e| ActivityPutError::make_invalid(Some(e.to_string())))?;
     }
 
     tx.commit()
