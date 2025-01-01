@@ -96,7 +96,7 @@
      * 活动未报满
   2. 插入相应数据
   3. 返回`okay_ = TRUE`
-* 发起签到 (`p_initiate_checkin(organizer_id_ INTEGER, activity_id_ INTEGER, valid_duration_ TIME, OUT okay_ BOOLEAN, OUT msg_ VARCHAR, OUT code_ VARCHAR)`)
+* 发起签到 (`p_initiate_checkin(organizer_id_ VARCHAR, activity_id_ INTEGER, valid_duration_ TIME, OUT okay_ BOOLEAN, OUT msg_ VARCHAR, OUT code_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 活动发起人相符
      * 已过活动开始时间
@@ -104,7 +104,7 @@
   2. 随机生成一密令
   3. 插入相应数据
   4. 返回`okay_ = TRUE`与密令`code_`
-* 发起签退 (`p_initiate_checkout(organizer_id_ INTEGER, activity_id_ INTEGER, valid_duration_ TIME, OUT okay_ BOOLEAN, OUT msg_ VARCHAR, OUT code_ VARCHAR)`)
+* 发起签退 (`p_initiate_checkout(organizer_id_ VARCHAR, activity_id_ INTEGER, valid_duration_ TIME, OUT okay_ BOOLEAN, OUT msg_ VARCHAR, OUT code_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 活动发起人相符
      * 已过活动开始时间
@@ -130,12 +130,12 @@
         * 该签退密令与提供密令相符
      2. 插入相应数据
   3. 若成功进行至少一次插入, 则返回`okay_ = TRUE`
-* 审核 (`p_audit(auditor_id_ INTEGER, activity_id_ INTEGER, audition_comment_ VARCHAR, audition_passed_ BOOLEAN, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
+* 审核 (`p_audit(auditor_id_ VARCHAR, activity_id_ INTEGER, audition_comment_ VARCHAR, audition_passed_ BOOLEAN, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 当前活动是否处于已开始签退状态
   2. 插入相应数据
   3. 返回`okay_ = TRUE`
-* 评价 (`p_rate(student_id_ INTEGER, activity_id_ INTEGER, rate_value_ DECIMAL, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
+* 评价 (`p_rate(student_id_ VARCHAR, activity_id_ INTEGER, rate_value_ DECIMAL, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 学生已在该活动中签退
   2. 插入相应数据

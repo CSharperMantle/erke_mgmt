@@ -1,5 +1,5 @@
 CREATE OR REPLACE PROCEDURE p_signup(
-  student_id_ INTEGER,
+  student_id_ VARCHAR,
   activity_id_ INTEGER,
   OUT okay_ BOOLEAN,
   OUT msg_ VARCHAR) AS
@@ -67,7 +67,7 @@ BEGIN
 END;
 
 CREATE OR REPLACE PROCEDURE p_initiate_checkin(
-  organizer_id_ INTEGER,
+  organizer_id_ VARCHAR,
   activity_id_ INTEGER,
   valid_duration_ TIME,
   OUT okay_ BOOLEAN,
@@ -116,7 +116,7 @@ BEGIN
 END;
 
 CREATE OR REPLACE PROCEDURE p_initiate_checkout(
-  organizer_id_ INTEGER,
+  organizer_id_ VARCHAR,
   activity_id_ INTEGER,
   valid_duration_ TIME,
   OUT okay_ BOOLEAN,
@@ -256,7 +256,7 @@ BEGIN
 END;
 
 CREATE OR REPLACE PROCEDURE p_audit(
-  auditor_id_ INTEGER,
+  auditor_id_ VARCHAR,
   activity_id_ INTEGER,
   audition_comment_ VARCHAR,
   audition_passed_ BOOLEAN,
@@ -282,7 +282,7 @@ BEGIN
 END;
 
 CREATE OR REPLACE PROCEDURE p_rate(
-  student_id_ INTEGER,
+  student_id_ VARCHAR,
   activity_id_ INTEGER,
   rate_value_ DECIMAL,
   OUT okay_ BOOLEAN,
