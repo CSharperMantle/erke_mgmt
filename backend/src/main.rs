@@ -13,6 +13,8 @@ fn rocket() -> _ {
             "/api/student",
             rocket::routes![
                 route::activity::route_activity_get,
+                route::do_checkinout::route_do_check_in_post,
+                route::do_checkinout::route_do_check_out_post,
                 route::rate::route_rating_agg_get,
                 route::rate::route_my_rate_get,
                 route::rate::route_my_rate_put,
@@ -23,6 +25,8 @@ fn rocket() -> _ {
             rocket::routes![
                 route::activity::route_activity_get,
                 route::activity::route_activity_put,
+                route::init_checkinout::route_initiate_check_in_post,
+                route::init_checkinout::route_initiate_check_out_post,
                 route::rate::route_rating_agg_get
             ],
         )

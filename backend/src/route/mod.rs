@@ -1,5 +1,7 @@
 pub mod activity;
 pub mod audit;
+pub mod do_checkinout;
+pub mod init_checkinout;
 pub mod login;
 pub mod logout;
 pub mod rate;
