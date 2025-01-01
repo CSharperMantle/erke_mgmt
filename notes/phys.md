@@ -111,7 +111,7 @@
      * 活动处于已开始签到状态
   2. 随机生成一密令
   3. 插入相应数据并返回`okay_ = TRUE`与密令`code_`
-* 执行签到 (`p_do_checkin(code_ VARCHAR, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
+* 执行签到 (`p_do_checkin(student_id_ VARCHAR, code_ VARCHAR, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 当前时间内有学生已报名活动状态为已开始签到
   2. 对于所有符合条件活动, 执行:
@@ -120,7 +120,7 @@
         * 该签到密令与提供密令相符
      2. 插入相应数据
   3. 若成功进行至少一次插入, 则返回`okay_ = TRUE`
-* 执行签退 (`p_do_checkout(code_ VARCHAR, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
+* 执行签退 (`p_do_checkout(student_id_ VARCHAR, code_ VARCHAR, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 当前时间内有学生已报名活动状态为已开始签退
   2. 对于所有符合条件活动, 执行:

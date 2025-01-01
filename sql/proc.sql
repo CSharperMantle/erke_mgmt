@@ -12,6 +12,12 @@ DECLARE
 BEGIN
   okay_ := FALSE;
   t := CURRENT_TIMESTAMP;
+
+  IF NOT f_check_session_user_is('student', student_id_) THEN
+    msg_ := 'cross-user operation';
+    RETURN;
+  END IF;
+
   IF NOT EXISTS (
     SELECT 1 FROM BeOpenTo b
     JOIN Student s ON b.grade_value=s.grade_value
@@ -70,6 +76,12 @@ CREATE OR REPLACE PROCEDURE p_initiate_checkin(
 DECLARE
 BEGIN
   okay_ := FALSE;
+
+  IF NOT f_check_session_user_is('organizer', organizer_id_) THEN
+    msg_ := 'cross-user operation';
+    RETURN;
+  END IF;
+
   IF NOT EXISTS (
     SELECT 1 FROM Activity a
     WHERE a.organizer_id_=organizer_id_ AND a.activity_id=activity_id_
@@ -115,6 +127,12 @@ DECLARE
 BEGIN
   t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
+
+  IF NOT f_check_session_user_is('organizer', organizer_id_) THEN
+    msg_ := 'cross-user operation';
+    RETURN;
+  END IF;
+
   IF NOT EXISTS (
     SELECT 1 FROM Activity a
     WHERE a.organizer_id=organizer_id_ AND a.activity_id=activity_id_
@@ -152,6 +170,7 @@ BEGIN
 END;
 
 CREATE OR REPLACE PROCEDURE p_do_checkin(
+  student_id_ VARCHAR,
   code_ VARCHAR,
   OUT okay_ BOOLEAN,
   OUT msg_ VARCHAR) AS
@@ -161,11 +180,16 @@ DECLARE
 BEGIN
   t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
+  IF NOT f_check_session_user_is('student', student_id_) THEN
+    msg_ := 'cross-user operation';
+    RETURN;
+  END IF;
   FOR v IN (
-    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM v_StudentSelfSignUp s
+    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM SignUp s
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE (
       a.activity_state=1
+      AND s.student_id_=student_id_
       AND EXISTS (
         SELECT 1 FROM InitiateCheckIn i
         WHERE (
@@ -187,6 +211,7 @@ BEGIN
 END;
 
 CREATE OR REPLACE PROCEDURE p_do_checkout(
+  student_id_ VARCHAR,
   code_ VARCHAR,
   OUT okay_ BOOLEAN,
   OUT msg_ VARCHAR) AS
@@ -196,11 +221,16 @@ DECLARE
 BEGIN
   t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
+  IF NOT f_check_session_user_is('student', student_id_) THEN
+    msg_ := 'cross-user operation';
+    RETURN;
+  END IF;
   FOR v IN (
-    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM v_StudentSelfSignUp s
+    SELECT s.student_id AS student_id, s.activity_id AS activity_id FROM SignUp s
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE (
       a.activity_state=2
+      AND s.student_id=student_id_
       AND EXISTS (
         SELECT 1 FROM DoCheckIn dci
         WHERE dci.student_id=s.student_id AND dci.activity_id=s.activity_id
@@ -235,6 +265,10 @@ CREATE OR REPLACE PROCEDURE p_audit(
 DECLARE
 BEGIN
   okay_ := FALSE;
+  IF NOT f_check_session_user_is('auditor', auditor_id_) THEN
+    msg_ := 'cross-user operation';
+    RETURN;
+  END IF;
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=activity_id_ AND activity_state=2
@@ -256,6 +290,10 @@ CREATE OR REPLACE PROCEDURE p_rate(
 DECLARE
 BEGIN
   okay_ := FALSE;
+  IF NOT f_check_session_user_is('student', student_id_) THEN
+    msg_ := 'cross-user operation';
+    RETURN;
+  END IF;
   IF NOT EXISTS (
     SELECT 1 FROM DoCheckOut
     WHERE student_id=student_id_ AND activity_id=activity_id_
