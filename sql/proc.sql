@@ -191,7 +191,7 @@ BEGIN
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE (
       a.activity_state=1
-      AND s.student_id_=student_id_
+      AND s.student_id=student_id_
       AND EXISTS (
         SELECT 1 FROM InitiateCheckIn i
         WHERE (

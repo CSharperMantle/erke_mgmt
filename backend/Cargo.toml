@@ -4,8 +4,9 @@ version = "0.1.0"
 edition = "2021"
 
 [dependencies]
+bigdecimal = { version = "0.4.7", features = [ "serde-json" ] }
 dotenvy_macro = "0.15.7"
 rocket = { version = "0.5.1", features = [ "secrets", "json" ] }
 serde = "1.0.217"
-sqlx = { version = "0.8.2", features = [ "runtime-tokio", "tls-native-tls", "postgres", "macros", "chrono" ] }
+sqlx = { version = "0.8.2", features = [ "runtime-tokio", "tls-native-tls", "postgres", "macros", "chrono", "bigdecimal" ] }
 url = "2.5.4"

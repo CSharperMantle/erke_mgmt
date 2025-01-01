@@ -1,9 +1,9 @@
 use super::{try_authenticate, DispatchSqlxError, RouteError};
+use bigdecimal::ToPrimitive;
 use rocket::serde::json::Json;
 use sqlx::Row;
 
-// Shape coincides with the SQL relation
-#[derive(serde::Serialize, sqlx::FromRow)]
+#[derive(serde::Serialize)]
 pub struct RatingAggGet {
     activity_id: i32,
     rate_cnt: i64,
@@ -33,9 +33,18 @@ type RatingGetError = RouteError<RatingGetResponse>;
 pub async fn route_rating_agg_get(
     jar: &rocket::http::CookieJar<'_>,
 ) -> Result<Json<RatingGetResponse>, RatingGetError> {
+    #[derive(sqlx::FromRow)]
+    pub struct RatingAggRow {
+        activity_id: i32,
+        rate_cnt: i64,
+        rate_avg: Option<bigdecimal::BigDecimal>,
+        rate_max: Option<bigdecimal::BigDecimal>,
+        rate_min: Option<bigdecimal::BigDecimal>,
+    }
+
     let mut conn = try_authenticate(jar).await?;
 
-    let data = sqlx::query_as::<sqlx::postgres::Postgres, RatingAggGet>(
+    let rows = sqlx::query_as::<sqlx::postgres::Postgres, RatingAggRow>(
         r##"
 SELECT activity_id, rate_cnt, rate_avg, rate_max, rate_min FROM v_RatingAgg;
 "##,
@@ -43,6 +52,17 @@ SELECT activity_id, rate_cnt, rate_avg, rate_max, rate_min FROM v_RatingAgg;
     .fetch_all(&mut conn)
     .await
     .dispatch_err()?;
+
+    let data = rows
+        .iter()
+        .map(|r| RatingAggGet {
+            activity_id: r.activity_id,
+            rate_cnt: r.rate_cnt,
+            rate_avg: r.rate_avg.as_ref().and_then(|v| v.to_f64()),
+            rate_max: r.rate_max.as_ref().and_then(|v| v.to_f64()),
+            rate_min: r.rate_min.as_ref().and_then(|v| v.to_f64()),
+        })
+        .collect();
 
     Ok(Json(RatingGetResponse {
         message: Default::default(),
@@ -54,7 +74,7 @@ SELECT activity_id, rate_cnt, rate_avg, rate_max, rate_min FROM v_RatingAgg;
 pub struct MyRateGet {
     student_id: String,
     activity_id: i32,
-    rate_value: f64,
+    rate_value: Option<f64>,
 }
 
 #[derive(serde::Serialize)]
@@ -78,9 +98,16 @@ type MyRateGetError = RouteError<MyRateGetResponse>;
 pub async fn route_my_rate_get(
     jar: &rocket::http::CookieJar<'_>,
 ) -> Result<Json<MyRateGetResponse>, MyRateGetError> {
+    #[derive(sqlx::FromRow)]
+    pub struct RateRow {
+        student_id: String,
+        activity_id: i32,
+        rate_value: bigdecimal::BigDecimal,
+    }
+
     let mut conn = try_authenticate(jar).await?;
 
-    let data = sqlx::query_as::<sqlx::postgres::Postgres, MyRateGet>(
+    let rows = sqlx::query_as::<sqlx::postgres::Postgres, RateRow>(
         r##"
 SELECT student_id, activity_id, rate_value FROM v_StudentSelfRate;
 "##,
@@ -88,6 +115,15 @@ SELECT student_id, activity_id, rate_value FROM v_StudentSelfRate;
     .fetch_all(&mut conn)
     .await
     .dispatch_err()?;
+
+    let data = rows
+        .iter()
+        .map(|r| MyRateGet {
+            student_id: r.student_id.clone(),
+            activity_id: r.activity_id,
+            rate_value: r.rate_value.to_f64(),
+        })
+        .collect();
 
     Ok(Json(MyRateGetResponse {
         message: Default::default(),
@@ -99,7 +135,7 @@ SELECT student_id, activity_id, rate_value FROM v_StudentSelfRate;
 pub struct MyRatePut {
     student_id: String,
     activity_id: i32,
-    rate_value: f64,
+    rate_value: bigdecimal::BigDecimal,
 }
 
 #[derive(serde::Deserialize)]
@@ -134,7 +170,7 @@ CALL p_rate($1, $2, $3, FALSE, '');
     )
     .bind(&req.data.student_id)
     .bind(req.data.activity_id)
-    .bind(req.data.rate_value)
+    .bind(&req.data.rate_value)
     .fetch_one(&mut conn)
     .await
     .dispatch_err()?;

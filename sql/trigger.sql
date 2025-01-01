@@ -3,7 +3,7 @@ BEGIN
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id AND CURRENT_TIMESTAMP<activity_signup_start_time
-  ) THEN
+  ) AND OLD.activity_state=NEW.activity_state THEN
     RAISE EXCEPTION 'activity is already open for signing up';
   END IF;
   RETURN NEW;
@@ -177,8 +177,8 @@ BEGIN
     SELECT 1 FROM DoCheckOut
     WHERE student_id=NEW.student_id AND activity_id=NEW.activity_id
   ) THEN
-  END IF;
     RAISE EXCEPTION 'student has not signed out in this activity';
+  END IF;
   RETURN NEW;
 END;
 $$ LANGUAGE plpgsql;
