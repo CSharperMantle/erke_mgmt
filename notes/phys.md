@@ -87,7 +87,7 @@
 
 ## 存储过程与函数
 
-* 报名 (`p_signup(student_id_ INTEGER, activity_id_ INTEGER, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
+* 报名 (`p_signup(student_id_ VARCHAR, activity_id_ INTEGER, OUT okay_ BOOLEAN, OUT msg_ VARCHAR)`)
   1. 检查是否满足以下条件 (AND):
      * 活动对该学生所在年级开放
      * 活动处于开放报名阶段
