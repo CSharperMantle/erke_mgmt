@@ -1,4 +1,4 @@
-import { createRef, useContext, useState } from "react"
+import { useContext, useState } from "react"
 
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import Accordion from "@mui/material/Accordion"
@@ -26,8 +26,8 @@ const LoginAccordion = () => {
 
   const { enqueueSnackbar } = useSnackbar()
 
-  const usernameRef = createRef<HTMLInputElement>()
-  const passwordRef = createRef<HTMLInputElement>()
+  const [username, setUsername] = useState("")
+  const [password, setPassword] = useState("")
 
   const [accountType, setAccountType] = useState("")
   const [loading, setLoading] = useState(false)
@@ -60,7 +60,8 @@ const LoginAccordion = () => {
               autoComplete="username"
               required={accountType !== "admin"}
               disabled={loggedIn}
-              inputRef={usernameRef}
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
             />
           </Grid2>
           <Grid2
@@ -96,7 +97,8 @@ const LoginAccordion = () => {
               autoComplete="current-password"
               required
               disabled={loggedIn}
-              inputRef={passwordRef}
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
             />
           </Grid2>
         </Grid2>
@@ -135,12 +137,10 @@ const LoginAccordion = () => {
             setLoading(true)
             try {
               const dbUsername =
-                accountType === "admin"
-                  ? "admin"
-                  : `${accountType}_${usernameRef.current?.value ?? ""}`
+                accountType === "admin" ? "admin" : `${accountType}_${username}`
               await invokeLogin({
                 username: dbUsername,
-                password: passwordRef.current?.value ?? "",
+                password,
               })
             } catch (ex) {
               const ex_ = ex as Error
@@ -167,7 +167,7 @@ const LoginAccordion = () => {
                 break
             }
             ctx.setLoginState(newState)
-            ctx.setUsername(usernameRef.current?.value ?? "")
+            ctx.setUsername(username)
           }}
         >
           登录

@@ -287,7 +287,6 @@ const ActivityDisplay = () => {
         <DataGrid
           rows={activities}
           columns={colDefs}
-          checkboxSelection
           disableRowSelectionOnClick
         />
       </div>
@@ -299,6 +298,10 @@ const ActivityDisplay = () => {
       </Backdrop>
     </Box>
   )
+}
+
+const RateActivity = () => {
+  return <></>
 }
 
 const StudentAccordion = () => {
@@ -322,6 +325,8 @@ const StudentAccordion = () => {
           <CheckInOut />
           <Divider variant="fullWidth" sx={{ color: "darkgray" }} />
           <ActivityDisplay />
+          <Divider variant="fullWidth" sx={{ color: "darkgray" }} />
+          <RateActivity />
         </Stack>
       </AccordionDetails>
     </Accordion>

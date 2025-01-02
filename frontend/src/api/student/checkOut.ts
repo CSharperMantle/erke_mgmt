@@ -15,7 +15,7 @@ interface CheckInResponse {
 
 const invoke = async (request: CheckOutRequest) => {
   const result = await invokeFetch<CheckOutRequest, CheckInResponse>(
-    "/api/student/do_check_in",
+    "/api/student/do_check_out",
     "POST",
     request
   )
