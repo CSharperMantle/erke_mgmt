@@ -1,6 +1,6 @@
 import invokeFetch from "../invokeFetch"
 
-interface Activity {
+export interface Activity {
   id: number
   organizer_id: string
   name: string

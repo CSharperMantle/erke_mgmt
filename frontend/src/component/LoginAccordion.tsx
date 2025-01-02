@@ -59,7 +59,7 @@ const LoginAccordion = () => {
               type="text"
               autoComplete="username"
               required={accountType !== "admin"}
-              disabled={loggedIn || accountType === "admin"}
+              disabled={loggedIn}
               inputRef={usernameRef}
             />
           </Grid2>
