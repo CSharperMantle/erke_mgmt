@@ -32,3 +32,20 @@ target/
 
 # Built Visual Studio Code Extensions
 *.vsix
+
+# https://github.com/toptal/gitignore/blob/4ba9bcf3455075a5288f3d59907049f5dcb8b1fc/templates/yarn.gitignore
+# https://yarnpkg.com/getting-started/qa#which-files-should-be-gitignored
+
+**/.yarn/*
+!**/.yarn/releases
+!**/.yarn/patches
+!**/.yarn/plugins
+!**/.yarn/sdks
+!**/.yarn/versions
+
+# if you are NOT using Zero-installs, then:
+# comment the following lines
+# !**/.yarn/cache
+
+# and uncomment the following lines
+.pnp.*
