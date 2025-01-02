@@ -100,12 +100,6 @@ const LoginAccordion = () => {
             />
           </Grid2>
         </Grid2>
-        <Backdrop
-          sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
-          open={loading}
-        >
-          <CircularProgress color="inherit" />
-        </Backdrop>
       </AccordionDetails>
       <AccordionActions>
         <Button
@@ -126,6 +120,7 @@ const LoginAccordion = () => {
               setLoading(false)
             }
             ctx.setLoginState(LoginState.NotLoggedIn)
+            ctx.setUsername(null)
           }}
         >
           注销
@@ -139,12 +134,12 @@ const LoginAccordion = () => {
             e.preventDefault()
             setLoading(true)
             try {
-              const username =
+              const dbUsername =
                 accountType === "admin"
                   ? "admin"
                   : `${accountType}_${usernameRef.current?.value ?? ""}`
               await invokeLogin({
-                username,
+                username: dbUsername,
                 password: passwordRef.current?.value ?? "",
               })
             } catch (ex) {
@@ -172,11 +167,18 @@ const LoginAccordion = () => {
                 break
             }
             ctx.setLoginState(newState)
+            ctx.setUsername(usernameRef.current?.value ?? "")
           }}
         >
           登录
         </Button>
       </AccordionActions>
+      <Backdrop
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
     </Accordion>
   )
 }

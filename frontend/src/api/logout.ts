@@ -1,6 +1,6 @@
 import invokeFetch from "./invokeFetch"
 
-export interface LogoutResponse {
+interface LogoutResponse {
   message: string
 }
 

@@ -11,11 +11,15 @@ export const enum LoginState {
 export interface LoginStateContextType {
   loginState: LoginState
   setLoginState: (loginState: LoginState) => void
+  username: string | null
+  setUsername: (username: string | null) => void
 }
 
 export const LoginStateContext = createContext<LoginStateContextType>({
   loginState: LoginState.NotLoggedIn,
   setLoginState: () => {},
+  username: null,
+  setUsername: () => {},
 })
 
 import { ReactNode } from "react"
@@ -26,9 +30,12 @@ export const LoginStateContextProvider = ({
   children?: ReactNode
 }) => {
   const [loginState, setLoginState] = useState(LoginState.NotLoggedIn)
+  const [username, setUsername] = useState<string | null>(null)
 
   return (
-    <LoginStateContext.Provider value={{ loginState, setLoginState }}>
+    <LoginStateContext.Provider
+      value={{ loginState, setLoginState, username, setUsername }}
+    >
       {children}
     </LoginStateContext.Provider>
   )

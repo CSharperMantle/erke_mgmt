@@ -1,11 +1,11 @@
 import invokeFetch from "./invokeFetch"
 
-export interface LoginRequest {
+interface LoginRequest {
   username: string
   password: string
 }
 
-export interface LoginResponse {
+interface LoginResponse {
   message: string
 }
 
