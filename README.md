@@ -1,17 +1,22 @@
 # erke_mgmt
 
-Assignment for HDU 2024 summer course "Database Principles and Practice" (WIP).
+Assignment for HDU (2024-2025-1)-S0512290-01 "Database Principles and Practice".
 
 ## Project structure
 
 Open design files with PowerDesigner.
 
-* pd/: PowerDesigner files
+* [pd/](pd/): PowerDesigner files
   * erke_powerdesigner.sws: Workspace file
   * erke_dfd.*: Data flow diagram
   * erke_cdm.*: Conceptual data model
   * erke_ldm.*: Logical data model (generated from CDM)
   * erke_pdm.*: Physical data model (generated from LDM)
-* notes/: Design notes
-* sql/: Handwritten SQL scripts
-* backend/: Server implementation
+* [notes/](notes/): Design notes
+* [sql/](sql/): Handwritten SQL scripts
+* [backend/](backend/): Server implementation
+* [frontend/](frontend/): Frontend implementation
+
+## Build
+
+TBA.
