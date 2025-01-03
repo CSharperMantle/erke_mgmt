@@ -200,6 +200,21 @@ const CreateActivity = () => {
               variant="contained"
               color="primary"
               type="submit"
+              disabled={
+                loading ||
+                [
+                  activityName,
+                  activityLocation,
+                  signupStartTime,
+                  signupEndTime,
+                  startTime,
+                  endTime,
+                  maxParticpCount,
+                  tags,
+                  openTo,
+                  description,
+                ].some((field) => field.length === 0)
+              }
               onClick={async () => {
                 const tagsArr = tags.split(",").map((tag) => parseInt(tag))
                 const openToArr = openTo
@@ -231,7 +246,7 @@ const CreateActivity = () => {
                 }
               }}
             >
-              提交
+              创建活动
             </Button>
           </Container>
         </Grid2>
@@ -258,6 +273,25 @@ const ActivityDisplay = () => {
   const colDefs: GridColDef[] = [
     { field: "id", type: "number", headerName: "编号", width: 50 },
     { field: "name", type: "string", headerName: "名称" },
+    {
+      field: "state",
+      type: "string",
+      headerName: "状态",
+      valueGetter: (v: number) => {
+        switch (v) {
+          case 0:
+            return "未开始签到"
+          case 1:
+            return "已开放签到"
+          case 2:
+            return "已开放签退"
+          case 3:
+            return "完结已审核"
+          default:
+            return "?"
+        }
+      },
+    },
     {
       field: "tags",
       headerName: "标签",
@@ -323,25 +357,6 @@ const ActivityDisplay = () => {
       type: "number",
       headerName: "人数上限",
       width: 75,
-    },
-    {
-      field: "state",
-      type: "string",
-      headerName: "状态",
-      valueGetter: (v: number) => {
-        switch (v) {
-          case 0:
-            return "未开始签到"
-          case 1:
-            return "签到中"
-          case 2:
-            return "签退中"
-          case 3:
-            return "完结已审核"
-          default:
-            return "?"
-        }
-      },
     },
   ]
 
@@ -477,20 +492,22 @@ const InitiateCheckInOut = () => {
           </Container>
         </Grid2>
         <Grid2 size={3}>
-          <TextField
-            label="密令"
-            variant="standard"
-            fullWidth
-            type="text"
-            value={codeValue}
-            disabled={checkInOut === null}
-            slotProps={{
-              input: {
-                readOnly: true,
-              },
-              inputLabel: { shrink: true },
-            }}
-          />
+          <Container maxWidth="xs">
+            <TextField
+              label="密令"
+              variant="standard"
+              fullWidth
+              type="text"
+              value={codeValue}
+              disabled={checkInOut === null}
+              slotProps={{
+                input: {
+                  readOnly: true,
+                },
+                inputLabel: { shrink: true },
+              }}
+            />
+          </Container>
         </Grid2>
       </Grid2>
       <Backdrop

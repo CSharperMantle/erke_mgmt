@@ -25,6 +25,7 @@ import {
   GridRenderCellParams,
   GridRowParams,
 } from "@mui/x-data-grid"
+import Rating from "@mui/material/Rating"
 import { useSnackbar } from "notistack"
 
 import invokeCheckIn from "../api/student/checkIn"
@@ -35,6 +36,7 @@ import invokeGetAvailActivity, {
 } from "../api/student/getAvailActivity"
 import invokeGetTag, { Tag } from "../api/student/getTag"
 import invokePutSignUp from "../api/student/putSignUp"
+import invokePutRate from "../api/student/putRate"
 import { LoginState, LoginStateContext } from "../state"
 import GrayAccordionSummary from "./GrayAccordionSummary"
 
@@ -140,7 +142,7 @@ const ActivityDisplay = () => {
       getActions: (params: GridRowParams) => {
         if (
           params.row.id === undefined ||
-          !availActivities.includes(params.row.id)
+          !availActivities.map((a) => a.activity_id).includes(params.row.id)
         ) {
           return []
         } else {
@@ -248,9 +250,9 @@ const ActivityDisplay = () => {
           case 0:
             return "未开始签到"
           case 1:
-            return "签到中"
+            return "已开放签到"
           case 2:
-            return "签退中"
+            return "已开放签退"
           case 3:
             return "完结已审核"
           default:
@@ -301,7 +303,84 @@ const ActivityDisplay = () => {
 }
 
 const RateActivity = () => {
-  return <></>
+  const ctx = useContext(LoginStateContext)
+
+  const { enqueueSnackbar } = useSnackbar()
+
+  const [loading, setLoading] = useState(false)
+  const [activityId, setActivityId] = useState<string | null>(null)
+  const [rating, setRating] = useState<number | null>(null)
+
+  return (
+    <>
+      <Grid2
+        container
+        columns={{ sm: 3, xs: 1 }}
+        spacing={2}
+        alignItems="center"
+      >
+        <Grid2 size={1}>
+          <TextField
+            label="活动编号"
+            variant="standard"
+            fullWidth
+            type="number"
+            required
+            value={activityId}
+            onChange={(e) => setActivityId(e.target.value)}
+          />
+        </Grid2>
+        <Grid2 size={1}>
+          <Stack alignItems="center">
+            <Rating
+              size="large"
+              value={rating}
+              precision={1}
+              onChange={(_, newValue) => {
+                setRating(newValue)
+              }}
+            />
+          </Stack>
+        </Grid2>
+        <Grid2 size={1}>
+          <Container maxWidth="xs">
+            <Button
+              variant="contained"
+              color="primary"
+              fullWidth
+              disabled={activityId === null || rating === null}
+              onClick={async () => {
+                setLoading(true)
+                try {
+                  await invokePutRate({
+                    data: {
+                      student_id: ctx.username ?? "",
+                      activity_id: parseInt(activityId ?? "0"),
+                      rate_value: rating ?? 0,
+                    },
+                  })
+                  enqueueSnackbar("评分成功", { variant: "success" })
+                } catch (ex) {
+                  const ex_ = ex as Error
+                  enqueueSnackbar(ex_.message, { variant: "error" })
+                } finally {
+                  setLoading(false)
+                }
+              }}
+            >
+              提交评分
+            </Button>
+          </Container>
+        </Grid2>
+      </Grid2>
+      <Backdrop
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </>
+  )
 }
 
 const StudentAccordion = () => {
