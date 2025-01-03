@@ -262,8 +262,6 @@ const CreateActivity = () => {
 }
 
 const ActivityDisplay = () => {
-  const ctx = useContext(LoginStateContext)
-
   const { enqueueSnackbar } = useSnackbar()
 
   const [loading, setLoading] = useState(false)

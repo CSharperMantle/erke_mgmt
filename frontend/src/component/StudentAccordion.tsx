@@ -331,7 +331,7 @@ const RateActivity = () => {
           />
         </Grid2>
         <Grid2 size={1}>
-          <Stack alignItems="center">
+          <Stack direction="column" alignItems="center">
             <Rating
               size="large"
               value={rating}

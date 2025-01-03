@@ -278,7 +278,7 @@ BEGIN
     msg_ := 'activity state is invalid';
     RETURN;
   END IF;
-  INSERT INTO "Audit"(auditor_id, activity_id, audition_comment, audition_passed) VALUES (auditor_id_, activity_id_, audition_comment_, audition_passed_);
+  INSERT INTO "Audit"(auditor_id, activity_id, audit_comment, audit_passed) VALUES (auditor_id_, activity_id_, audition_comment_, audition_passed_);
   okay_ := TRUE;
   msg_ := '';
 END;

@@ -158,7 +158,7 @@ EXECUTE PROCEDURE tf_audit_insert_check_activity_state();
 
 CREATE OR REPLACE FUNCTION tf_audit_insert_update_activity_state() RETURNS TRIGGER AS $$
 BEGIN
-  IF (NEW.audit_passed==TRUE) THEN
+  IF (NEW.audit_passed=TRUE) THEN
     UPDATE Activity SET activity_state=3
     WHERE activity_id=NEW.activity_id;
   END IF;
