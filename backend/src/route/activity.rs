@@ -4,7 +4,7 @@ use sqlx::{types::chrono, Connection, Row};
 
 #[derive(serde::Serialize)]
 pub struct ActivityGet {
-    id: Option<i32>,
+    id: i32,
     organizer_id: String,
     name: String,
     description: String,
@@ -14,7 +14,7 @@ pub struct ActivityGet {
     start_time: i64,
     end_time: i64,
     max_particp_count: i32,
-    state: Option<i32>,
+    state: i32,
     tags: Vec<i32>,
     open_to: Vec<i32>,
 }
@@ -130,7 +130,7 @@ FROM BeOpenTo bo;
                 .map(|bo| bo.grade_value)
                 .collect();
             ActivityGet {
-                id: Some(a.activity_id),
+                id: a.activity_id,
                 organizer_id: a.organizer_id.clone(),
                 name: a.activity_name.clone(),
                 description: a.activity_description.clone(),
@@ -140,7 +140,7 @@ FROM BeOpenTo bo;
                 start_time: a.activity_start_time.timestamp_millis(),
                 end_time: a.activity_end_time.timestamp_millis(),
                 max_particp_count: a.activity_max_particp_count,
-                state: Some(a.activity_state),
+                state: a.activity_state,
                 tags,
                 open_to,
             }

@@ -6,6 +6,7 @@ use sqlx::Row;
 #[derive(serde::Serialize)]
 pub struct RatingAggGet {
     activity_id: i32,
+    activity_name: String,
     rate_cnt: i64,
     rate_avg: Option<f64>,
     rate_max: Option<f64>,
@@ -36,6 +37,7 @@ pub async fn route_rating_agg_get(
     #[derive(sqlx::FromRow)]
     pub struct RatingAggRow {
         activity_id: i32,
+        activity_name: String,
         rate_cnt: i64,
         rate_avg: Option<bigdecimal::BigDecimal>,
         rate_max: Option<bigdecimal::BigDecimal>,
@@ -46,7 +48,7 @@ pub async fn route_rating_agg_get(
 
     let rows = sqlx::query_as::<sqlx::postgres::Postgres, RatingAggRow>(
         r##"
-SELECT activity_id, rate_cnt, rate_avg, rate_max, rate_min FROM v_RatingAgg;
+SELECT activity_id, activity_name, rate_cnt, rate_avg, rate_max, rate_min FROM v_RatingAgg;
 "##,
     )
     .fetch_all(&mut conn)
@@ -57,6 +59,7 @@ SELECT activity_id, rate_cnt, rate_avg, rate_max, rate_min FROM v_RatingAgg;
         .iter()
         .map(|r| RatingAggGet {
             activity_id: r.activity_id,
+            activity_name: r.activity_name.clone(),
             rate_cnt: r.rate_cnt,
             rate_avg: r.rate_avg.as_ref().and_then(|v| v.to_f64()),
             rate_max: r.rate_max.as_ref().and_then(|v| v.to_f64()),
