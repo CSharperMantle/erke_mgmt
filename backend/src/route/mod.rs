@@ -1,4 +1,5 @@
 pub mod activity;
+pub mod activity_audit;
 pub mod audit;
 pub mod do_checkinout;
 pub mod init_checkinout;

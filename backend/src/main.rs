@@ -33,7 +33,8 @@ fn rocket() -> _ {
                 route::tag::route_tag_get,
                 route::init_checkinout::route_initiate_check_in_post,
                 route::init_checkinout::route_initiate_check_out_post,
-                route::rate::route_rating_agg_get
+                route::rate::route_rating_agg_get,
+                route::activity_audit::route_my_activity_audit_get,
             ],
         )
         .mount(

@@ -55,3 +55,18 @@ CREATE VIEW v_StudentNonParticipActivity AS
       WHERE d.activity_id=s.activity_id AND d.student_id=s.student_id
     )
   );
+
+DROP VIEW IF EXISTS v_OrganizerSelfAudit;
+CREATE VIEW v_OrganizerSelfAudit AS
+  SELECT
+    au.audit_id AS audit_id,
+    au.auditor_id AS auditor_id,
+    aur.auditor_name AS auditor_name,
+    au.activity_id AS activity_id,
+    a.activity_name AS activity_name,
+    au.audit_comment AS audit_comment,
+    au.audit_passed AS audit_passed
+  FROM "Audit" au
+  INNER JOIN Auditor aur ON au.auditor_id=aur.auditor_id
+  INNER JOIN Activity a ON au.activity_id=a.activity_id
+  WHERE f_check_session_user_is('organizer', organizer_id);

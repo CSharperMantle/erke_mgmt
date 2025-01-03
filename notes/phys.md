@@ -54,6 +54,8 @@
   * 根据当前登录学生年级信息筛选对该生开放的活动
 * 当前学生缺席活动 (`v_StudentNonParticipActivity(activity_id INT4)`, `SESSION_USER`相关)
   * 筛选已开始签退但当前登录学生尚未签到的活动
+* 当前组织者审核记录 (`v_OrganizerSelfAudit(audit_id INT4, auditor_id VARCHAR, auditor_name VARCHAR, activity_id INT4, activity_name VARCHAR, audit_comment VARCHAR, audit_passed BOOLEAN)`)
+提供当前组织者的审核记录，包括审核ID、审核员ID、审核员姓名、活动ID、活动名称、审核评论和审核是否通过
 
 ## 索引列
 

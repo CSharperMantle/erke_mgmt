@@ -33,7 +33,12 @@ const ActivityDisplay = () => {
 
   const colDefs: GridColDef[] = [
     { field: "activity_id", type: "number", headerName: "活动编号" },
-    { field: "activity_name", type: "string", headerName: "活动名称" },
+    {
+      field: "activity_name",
+      type: "string",
+      headerName: "活动名称",
+      width: 150,
+    },
     { field: "rate_cnt", type: "number", headerName: "评分人数" },
     { field: "rate_avg", type: "number", headerName: "平均评分" },
     { field: "rate_max", type: "number", headerName: "最高评分" },

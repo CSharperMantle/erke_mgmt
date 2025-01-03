@@ -27,6 +27,9 @@ import invokeGetTag, { Tag } from "../api/organizer/getTag"
 import invokeInitiateCheckIn from "../api/organizer/initiateCheckIn"
 import invokeInitiateCheckOut from "../api/organizer/initiateCheckOut"
 import invokePutActivity from "../api/organizer/putActivity"
+import invokeGetActivityAudit, {
+  ActivityAudit,
+} from "../api/organizer/getActivityAudit"
 import parseActivityState from "../parseActivityState"
 import { LoginState, LoginStateContext } from "../state"
 import GrayAccordionSummary from "./GrayAccordionSummary"
@@ -499,6 +502,74 @@ const InitiateCheckInOut = () => {
   )
 }
 
+const ActivityAuditDisplay = () => {
+  const { enqueueSnackbar } = useSnackbar()
+
+  const [loading, setLoading] = useState(false)
+  const [audits, setAudits] = useState<ActivityAudit[]>([])
+
+  const colDefs: GridColDef[] = [
+    { field: "id", type: "number", headerName: "编号", width: 50 },
+    { field: "auditor", type: "string", headerName: "审核员", width: 150 },
+    { field: "activity_id", type: "number", headerName: "活动编号" },
+    {
+      field: "activity_name",
+      type: "string",
+      headerName: "活动名称",
+      width: 150,
+    },
+    {
+      field: "audit_comment",
+      type: "string",
+      headerName: "审核意见",
+      width: 200,
+    },
+    { field: "audit_passed", type: "boolean", headerName: "审核结果" },
+  ]
+
+  return (
+    <Box sx={{ width: "100%" }}>
+      <Stack direction="row-reverse" spacing={1} sx={{ mb: 1 }}>
+        <Button
+          size="small"
+          variant="outlined"
+          onClick={async () => {
+            setLoading(true)
+            try {
+              setAudits((await invokeGetActivityAudit()).data)
+            } catch (ex) {
+              const ex_ = ex as Error
+              enqueueSnackbar(ex_.message, { variant: "error" })
+            } finally {
+              setLoading(false)
+            }
+          }}
+        >
+          <RefreshIcon />
+        </Button>
+      </Stack>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <DataGrid
+          rows={audits.map((r) => {
+            return {
+              ...r,
+              auditor: `${r.auditor_name} (${r.auditor_id})`,
+            }
+          })}
+          columns={colDefs}
+          disableRowSelectionOnClick
+        />
+      </div>
+      <Backdrop
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </Box>
+  )
+}
+
 const OrganizerAccordion = () => {
   const ctx = useContext(LoginStateContext)
 
@@ -522,6 +593,8 @@ const OrganizerAccordion = () => {
           <ActivityDisplay />
           <Divider variant="fullWidth" sx={{ color: "darkgray" }} />
           <InitiateCheckInOut />
+          <Divider variant="fullWidth" sx={{ color: "darkgray" }} />
+          <ActivityAuditDisplay />
         </Stack>
       </AccordionDetails>
     </Accordion>
