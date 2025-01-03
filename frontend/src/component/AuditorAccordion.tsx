@@ -1,6 +1,5 @@
-import { useContext, useRef, useState } from "react"
+import { useContext, useState } from "react"
 
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import RefreshIcon from "@mui/icons-material/Refresh"
 import Accordion from "@mui/material/Accordion"
@@ -8,32 +7,23 @@ import AccordionDetails from "@mui/material/AccordionDetails"
 import Backdrop from "@mui/material/Backdrop"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Chip from "@mui/material/Chip"
 import CircularProgress from "@mui/material/CircularProgress"
 import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
+import FormControlLabel from "@mui/material/FormControlLabel"
+import FormGroup from "@mui/material/FormGroup"
 import Grid2 from "@mui/material/Grid2"
 import Stack from "@mui/material/Stack"
+import Switch from "@mui/material/Switch"
 import TextField from "@mui/material/TextField"
-import ToggleButton from "@mui/material/ToggleButton"
-import ToggleButtonGroup from "@mui/material/ToggleButtonGroup"
 import Typography from "@mui/material/Typography"
-import {
-  DataGrid,
-  GridActionsCellItem,
-  GridColDef,
-  GridRenderCellParams,
-  GridRowParams,
-} from "@mui/x-data-grid"
+import { DataGrid, GridColDef } from "@mui/x-data-grid"
 import { useSnackbar } from "notistack"
 
-import { LoginState, LoginStateContext } from "../state"
-import GrayAccordionSummary from "./GrayAccordionSummary"
 import invokeGetRatingAgg, { RatingAgg } from "../api/auditor/getRatingAgg"
 import invokePutAudit from "../api/auditor/putAudit"
-import FormGroup from "@mui/material/FormGroup"
-import FormControlLabel from "@mui/material/FormControlLabel"
-import Switch from "@mui/material/Switch"
+import { LoginState, LoginStateContext } from "../state"
+import GrayAccordionSummary from "./GrayAccordionSummary"
 
 const ActivityDisplay = () => {
   const { enqueueSnackbar } = useSnackbar()

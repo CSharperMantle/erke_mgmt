@@ -13,6 +13,7 @@ import CircularProgress from "@mui/material/CircularProgress"
 import Container from "@mui/material/Container"
 import Divider from "@mui/material/Divider"
 import Grid2 from "@mui/material/Grid2"
+import Rating from "@mui/material/Rating"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import ToggleButton from "@mui/material/ToggleButton"
@@ -25,7 +26,6 @@ import {
   GridRenderCellParams,
   GridRowParams,
 } from "@mui/x-data-grid"
-import Rating from "@mui/material/Rating"
 import { useSnackbar } from "notistack"
 
 import invokeCheckIn from "../api/student/checkIn"
@@ -35,8 +35,9 @@ import invokeGetAvailActivity, {
   AvailActivity,
 } from "../api/student/getAvailActivity"
 import invokeGetTag, { Tag } from "../api/student/getTag"
-import invokePutSignUp from "../api/student/putSignUp"
 import invokePutRate from "../api/student/putRate"
+import invokePutSignUp from "../api/student/putSignUp"
+import parseActivityState from "../parseActivityState"
 import { LoginState, LoginStateContext } from "../state"
 import GrayAccordionSummary from "./GrayAccordionSummary"
 
@@ -245,20 +246,7 @@ const ActivityDisplay = () => {
       field: "state",
       type: "string",
       headerName: "状态",
-      valueGetter: (v: number) => {
-        switch (v) {
-          case 0:
-            return "未开始签到"
-          case 1:
-            return "已开放签到"
-          case 2:
-            return "已开放签退"
-          case 3:
-            return "完结已审核"
-          default:
-            return "?"
-        }
-      },
+      valueGetter: (v: number) => parseActivityState(v),
     },
   ]
 

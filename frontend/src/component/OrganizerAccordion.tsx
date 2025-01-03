@@ -1,6 +1,5 @@
 import { useContext, useRef, useState } from "react"
 
-import CheckCircleIcon from "@mui/icons-material/CheckCircle"
 import ExpandMoreIcon from "@mui/icons-material/ExpandMore"
 import RefreshIcon from "@mui/icons-material/Refresh"
 import Accordion from "@mui/material/Accordion"
@@ -18,24 +17,19 @@ import TextField from "@mui/material/TextField"
 import ToggleButton from "@mui/material/ToggleButton"
 import ToggleButtonGroup from "@mui/material/ToggleButtonGroup"
 import Typography from "@mui/material/Typography"
-import {
-  DataGrid,
-  GridActionsCellItem,
-  GridColDef,
-  GridRenderCellParams,
-  GridRowParams,
-} from "@mui/x-data-grid"
+import { DataGrid, GridColDef, GridRenderCellParams } from "@mui/x-data-grid"
 import { useSnackbar } from "notistack"
 
-import { LoginState, LoginStateContext } from "../state"
-import GrayAccordionSummary from "./GrayAccordionSummary"
 import invokeGetActivity, {
   Activity as GetActivity,
 } from "../api/organizer/getActivity"
-import invokePutActivity from "../api/organizer/putActivity"
 import invokeGetTag, { Tag } from "../api/organizer/getTag"
 import invokeInitiateCheckIn from "../api/organizer/initiateCheckIn"
 import invokeInitiateCheckOut from "../api/organizer/initiateCheckOut"
+import invokePutActivity from "../api/organizer/putActivity"
+import parseActivityState from "../parseActivityState"
+import { LoginState, LoginStateContext } from "../state"
+import GrayAccordionSummary from "./GrayAccordionSummary"
 
 const CreateActivity = () => {
   const ctx = useContext(LoginStateContext)
@@ -275,20 +269,7 @@ const ActivityDisplay = () => {
       field: "state",
       type: "string",
       headerName: "状态",
-      valueGetter: (v: number) => {
-        switch (v) {
-          case 0:
-            return "未开始签到"
-          case 1:
-            return "已开放签到"
-          case 2:
-            return "已开放签退"
-          case 3:
-            return "完结已审核"
-          default:
-            return "?"
-        }
-      },
+      valueGetter: (v: number) => parseActivityState(v),
     },
     {
       field: "tags",
