@@ -572,12 +572,17 @@ const ActivityAuditDisplay = () => {
 
 const OrganizerAccordion = () => {
   const ctx = useContext(LoginStateContext)
+  
+  const [shouldOpen, setShouldOpen] = useState(false)
+  const disabled = ![LoginState.AsOrganizer, LoginState.AsAdmin].includes(
+    ctx.loginState
+  )
 
   return (
     <Accordion
-      disabled={
-        ![LoginState.AsOrganizer, LoginState.AsAdmin].includes(ctx.loginState)
-      }
+      disabled={disabled}
+      expanded={shouldOpen && !disabled}
+      onChange={(_, expanded) => setShouldOpen(expanded)}
     >
       <GrayAccordionSummary
         expandIcon={<ExpandMoreIcon />}

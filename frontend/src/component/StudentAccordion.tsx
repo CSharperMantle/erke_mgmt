@@ -434,11 +434,16 @@ const RatingAggDisplay = () => {
 const StudentAccordion = () => {
   const ctx = useContext(LoginStateContext)
 
+  const [shouldOpen, setShouldOpen] = useState(false)
+  const disabled = ![LoginState.AsStudent, LoginState.AsAdmin].includes(
+    ctx.loginState
+  )
+
   return (
     <Accordion
-      disabled={
-        ![LoginState.AsStudent, LoginState.AsAdmin].includes(ctx.loginState)
-      }
+      disabled={disabled}
+      expanded={shouldOpen && !disabled}
+      onChange={(_, expanded) => setShouldOpen(expanded)}
     >
       <GrayAccordionSummary
         expandIcon={<ExpandMoreIcon />}

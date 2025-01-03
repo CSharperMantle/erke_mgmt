@@ -188,11 +188,16 @@ const Audit = () => {
 const AuditorAccordion = () => {
   const ctx = useContext(LoginStateContext)
 
+  const [shouldOpen, setShouldOpen] = useState(false)
+  const disabled = ![LoginState.AsAuditor, LoginState.AsAdmin].includes(
+    ctx.loginState
+  )
+
   return (
     <Accordion
-      disabled={
-        ![LoginState.AsAuditor, LoginState.AsAdmin].includes(ctx.loginState)
-      }
+      disabled={disabled}
+      expanded={shouldOpen && !disabled}
+      onChange={(_, expanded) => setShouldOpen(expanded)}
     >
       <GrayAccordionSummary
         expandIcon={<ExpandMoreIcon />}
