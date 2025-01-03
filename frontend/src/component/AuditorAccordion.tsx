@@ -25,7 +25,7 @@ import invokePutAudit from "../api/auditor/putAudit"
 import { LoginState, LoginStateContext } from "../state"
 import GrayAccordionSummary from "./GrayAccordionSummary"
 
-const ActivityDisplay = () => {
+const RatingAggDisplay = () => {
   const { enqueueSnackbar } = useSnackbar()
 
   const [loading, setLoading] = useState(false)
@@ -203,7 +203,7 @@ const AuditorAccordion = () => {
       </GrayAccordionSummary>
       <AccordionDetails>
         <Stack direction="column" spacing={2} sx={{ pt: 2, pb: 2 }}>
-          <ActivityDisplay />
+          <RatingAggDisplay />
           <Divider variant="fullWidth" sx={{ color: "darkgray" }} />
           <Audit />
         </Stack>

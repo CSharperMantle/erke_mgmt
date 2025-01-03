@@ -28,6 +28,7 @@ import {
 } from "@mui/x-data-grid"
 import { useSnackbar } from "notistack"
 
+import invokeGetRatingAgg, { RatingAgg } from "../api/auditor/getRatingAgg"
 import invokeCheckIn from "../api/student/checkIn"
 import invokeCheckOut from "../api/student/checkOut"
 import invokeGetActivity, { Activity } from "../api/student/getActivity"
@@ -371,6 +372,65 @@ const RateActivity = () => {
   )
 }
 
+const RatingAggDisplay = () => {
+  const { enqueueSnackbar } = useSnackbar()
+
+  const [loading, setLoading] = useState(false)
+  const [ratingAgg, setRatingAgg] = useState<RatingAgg[]>([])
+
+  const colDefs: GridColDef[] = [
+    { field: "activity_id", type: "number", headerName: "活动编号" },
+    {
+      field: "activity_name",
+      type: "string",
+      headerName: "活动名称",
+      width: 150,
+    },
+    { field: "rate_cnt", type: "number", headerName: "评分人数" },
+    { field: "rate_avg", type: "number", headerName: "平均评分" },
+    { field: "rate_max", type: "number", headerName: "最高评分" },
+    { field: "rate_min", type: "number", headerName: "最低评分" },
+  ]
+
+  return (
+    <Box sx={{ width: "100%" }}>
+      <Stack direction="row-reverse" spacing={1} sx={{ mb: 1 }}>
+        <Button
+          size="small"
+          variant="outlined"
+          onClick={async () => {
+            setLoading(true)
+            try {
+              setRatingAgg((await invokeGetRatingAgg()).data)
+            } catch (ex) {
+              const ex_ = ex as Error
+              enqueueSnackbar(ex_.message, { variant: "error" })
+            } finally {
+              setLoading(false)
+            }
+          }}
+        >
+          <RefreshIcon />
+        </Button>
+      </Stack>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <DataGrid
+          rows={ratingAgg}
+          columns={colDefs}
+          getRowId={(row) => row.activity_id}
+          disableRowSelectionOnClick
+        />
+      </div>
+      <Backdrop
+        sx={(theme) => ({ color: "#fff", zIndex: theme.zIndex.drawer + 1 })}
+        open={loading}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+    </Box>
+  )
+}
+
 const StudentAccordion = () => {
   const ctx = useContext(LoginStateContext)
 
@@ -394,6 +454,8 @@ const StudentAccordion = () => {
           <ActivityDisplay />
           <Divider variant="fullWidth" sx={{ color: "darkgray" }} />
           <RateActivity />
+          <Divider variant="fullWidth" sx={{ color: "darkgray" }} />
+          <RatingAggDisplay />
         </Stack>
       </AccordionDetails>
     </Accordion>
