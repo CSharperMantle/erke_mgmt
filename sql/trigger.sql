@@ -4,7 +4,7 @@ BEGIN
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id AND CURRENT_TIMESTAMP<activity_signup_start_time
   ) AND OLD.activity_state=NEW.activity_state THEN
-    RAISE EXCEPTION 'activity is already open for signing up';
+    RAISE EXCEPTION '活动已开放报名，无法修改';
   END IF;
   RETURN NEW;
 END;
@@ -27,7 +27,7 @@ BEGIN
     JOIN Student s ON b.grade_value=s.grade_value
     WHERE b.activity_id=NEW.activity_id AND s.student_id=NEW.student_id
   ) THEN 
-    RAISE EXCEPTION 'not open to this grade.';
+    RAISE EXCEPTION '活动未对该年级开放';
   END IF;
 
   IF NOT EXISTS (
@@ -35,20 +35,20 @@ BEGIN
     WHERE activity_id=NEW.activity_id
     AND CURRENT_TIMESTAMP BETWEEN activity_signup_start_time AND activity_signup_end_time
   ) THEN
-    RAISE EXCEPTION 'activity is not in the sign-up phase.';
+    RAISE EXCEPTION '活动未开放报名';
   END IF;
 
   IF EXISTS (
     SELECT 1 FROM SignUp
     WHERE student_id=NEW.student_id AND activity_id=NEW.activity_id
   ) THEN
-    RAISE EXCEPTION 'already sign up for this activity';
+    RAISE EXCEPTION '已报名该活动';
   END IF;
   
   SELECT cnt INTO current_count FROM v_ActivitySignUpCount WHERE activity_id=NEW.activity_id;
   SELECT activity_max_particp_count INTO max_count FROM Activity WHERE activity_id=NEW.activity_id;
   IF (current_count>=max_count) THEN
-    RAISE EXCEPTION 'activity is alread full';
+    RAISE EXCEPTION '活动报名人数已满';
   END IF;
   
   SELECT activity_start_time, activity_end_time INTO new_activity_start, new_activity_end FROM Activity
@@ -58,7 +58,7 @@ BEGIN
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE s.student_id=NEW.student_id AND ((a.activity_start_time, a.activity_end_time) OVERLAPS (new_activity_start, new_activity_end))
   ) THEN
-    RAISE EXCEPTION 'time conflict with other activities';
+    RAISE EXCEPTION '活动时间冲突';
   END IF;
   RETURN NEW;
 END;
@@ -75,7 +75,7 @@ BEGIN
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id AND CURRENT_TIMESTAMP>=activity_start_time AND (activity_state IN (0, 1))
   ) THEN
-    RAISE EXCEPTION 'activity state not valid for check-in';
+    RAISE EXCEPTION '当前活动状态下不可发起签到';
   END IF;
   RETURN NEW;
 END;
@@ -110,7 +110,7 @@ BEGIN
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id AND (activity_state IN (1, 2))
   ) THEN
-    RAISE EXCEPTION 'activity state invalid for check-out';
+    RAISE EXCEPTION '当前活动状态下不可发起签退';
   END IF;
   RETURN NEW;
 END;
@@ -145,7 +145,7 @@ BEGIN
     SELECT 1 FROM Activity
     WHERE activity_id=NEW.activity_id AND activity_state=2
   ) THEN
-    RAISE EXCEPTION 'activity state invalid for audit';
+    RAISE EXCEPTION '当前活动状态下不可审核';
   END IF;
   RETURN NEW;
 END;
@@ -177,7 +177,7 @@ BEGIN
     SELECT 1 FROM DoCheckOut
     WHERE student_id=NEW.student_id AND activity_id=NEW.activity_id
   ) THEN
-    RAISE EXCEPTION 'student has not signed out in this activity';
+    RAISE EXCEPTION '未在该活动中签退';
   END IF;
   RETURN NEW;
 END;

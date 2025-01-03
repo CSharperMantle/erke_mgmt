@@ -1,7 +1,7 @@
 export default function parseActivityState(v: number) {
   switch (v) {
     case 0:
-      return "未开始签到"
+      return "未开放签到"
     case 1:
       return "已开放签到"
     case 2:

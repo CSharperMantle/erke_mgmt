@@ -123,7 +123,6 @@ const Audit = () => {
           <Stack direction="column" alignItems="center">
             <FormGroup>
               <FormControlLabel
-                required
                 control={
                   <Switch
                     checked={passed}

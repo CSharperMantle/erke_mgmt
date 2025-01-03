@@ -14,7 +14,7 @@ BEGIN
   t := CURRENT_TIMESTAMP;
 
   IF NOT f_check_session_user_is('student', student_id_) THEN
-    msg_ := 'cross-user operation';
+    msg_ := '用户无效';
     RETURN;
   END IF;
 
@@ -23,7 +23,7 @@ BEGIN
     JOIN Student s ON b.grade_value=s.grade_value
     WHERE b.activity_id=activity_id AND s.student_id=student_id_
   ) THEN 
-    msg_ := 'not open to this grade.';
+    msg_ := '活动未对该年级开放';
     RETURN;
   END IF;
 
@@ -32,7 +32,7 @@ BEGIN
     WHERE activity_id=activity_id_
     AND t BETWEEN activity_signup_start_time AND activity_signup_end_time
   ) THEN
-    msg_ := 'activity is not in the sign-up phase.';
+    msg_ := '活动未开放报名';
     RETURN;
   END IF;
 
@@ -40,14 +40,14 @@ BEGIN
     SELECT 1 FROM SignUp
     WHERE student_id=student_id_ AND activity_id=activity_id_
   ) THEN
-    msg_ := 'already sign up for this activity';
+    msg_ := '已报名该活动';
     RETURN;
   END IF;
   
   SELECT cnt INTO current_count FROM v_ActivitySignUpCount WHERE activity_id=activity_id_;
   SELECT activity_max_particp_count INTO max_count FROM Activity WHERE activity_id=activity_id_;
   IF (current_count>=max_count) THEN
-    msg_ := 'activity is alread full';
+    msg_ := '活动报名人数已满';
     RETURN;
   END IF;
 
@@ -58,7 +58,7 @@ BEGIN
     INNER JOIN Activity a ON s.activity_id=a.activity_id
     WHERE s.student_id=student_id_ AND ((a.activity_start_time, a.activity_end_time) OVERLAPS (new_activity_start, new_activity_end))
   ) THEN
-    msg_ := 'time conflict with other activities';
+    msg_ := '活动时间冲突';
     RETURN;
   END IF;
   INSERT INTO SignUp(student_id, activity_id, signup_time) VALUES (student_id_, activity_id_, t);
@@ -80,15 +80,15 @@ BEGIN
   okay_ := FALSE;
 
   IF NOT f_check_session_user_is('organizer', organizer_id_) THEN
-    msg_ := 'cross-user operation';
+    msg_ := '用户无效';
     RETURN;
   END IF;
 
   IF NOT EXISTS (
     SELECT 1 FROM Activity a
-    WHERE a.organizer_id=organizer_id_ AND a.activity_id=activity_id_
+    WHERE a.activity_id=activity_id_ AND f_check_session_user_is('organizer', a.organizer_id)
   ) THEN
-    msg_ := 'not the same organizer';
+    msg_ := '组织者不符';
     RETURN;
   END IF;
 
@@ -96,7 +96,7 @@ BEGIN
     SELECT 1 FROM Activity a
     WHERE a.activity_id=activity_id_ AND t<activity_start_time
   ) THEN
-    msg_ := 'the activity is not started yet';
+    msg_ := '活动未开始';
     RETURN;
   END IF;
 
@@ -104,7 +104,7 @@ BEGIN
     SELECT 1 FROM Activity a
     WHERE a.activity_id=activity_id_ AND a.activity_state IN (0, 1)
   ) THEN
-    msg_ := 'the activity is not in the check-in period';
+    msg_ := '活动未开始签到';
     RETURN;
   END IF;
   code_ := f_gen_random_checkinout_code();
@@ -131,15 +131,15 @@ BEGIN
   okay_ := FALSE;
 
   IF NOT f_check_session_user_is('organizer', organizer_id_) THEN
-    msg_ := 'cross-user operation';
+    msg_ := '用户无效';
     RETURN;
   END IF;
 
   IF NOT EXISTS (
     SELECT 1 FROM Activity a
-    WHERE a.organizer_id=organizer_id_ AND a.activity_id=activity_id_
+    WHERE a.activity_id=activity_id_ AND f_check_session_user_is('organizer', a.organizer_id)
   ) THEN
-    msg_ := 'not the same organizer';
+    msg_ := '组织者不符';
     RETURN;
   END IF;
 
@@ -147,7 +147,7 @@ BEGIN
     SELECT 1 FROM Activity a
     WHERE a.activity_id=activity_id_ AND t<a.activity_start_time
   ) THEN
-    msg_ := 'the activity is not started yet';
+    msg_ := '活动未开始';
     RETURN;
   END IF;
 
@@ -155,7 +155,7 @@ BEGIN
     SELECT 1 FROM Activity a
     WHERE a.activity_id=activity_id_ AND a.activity_state IN (1, 2)
   ) THEN
-    msg_ := 'the activity is not in the check-out period';
+    msg_ := '活动未开始签退';
     RETURN;
   END IF;
 
@@ -183,7 +183,7 @@ BEGIN
   t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
   IF NOT f_check_session_user_is('student', student_id_) THEN
-    msg_ := 'cross-user operation';
+    msg_ := '用户无效';
     RETURN;
   END IF;
   FOR v IN (
@@ -208,7 +208,7 @@ BEGIN
   IF (okay_) THEN
     msg_ := '';
   ELSE
-    msg_ := 'invalid check-in code';
+    msg_ := '签到码不存在';
   END IF;
 END;
 
@@ -224,7 +224,7 @@ BEGIN
   t := CURRENT_TIMESTAMP;
   okay_ := FALSE;
   IF NOT f_check_session_user_is('student', student_id_) THEN
-    msg_ := 'cross-user operation';
+    msg_ := '用户无效';
     RETURN;
   END IF;
   FOR v IN (
@@ -253,7 +253,7 @@ BEGIN
   IF (okay_) THEN
     msg_ := '';
   ELSE
-    msg_ := 'invalid checkout code';
+    msg_ := '签退码不存在';
   END IF;
 END;
 
@@ -268,14 +268,14 @@ DECLARE
 BEGIN
   okay_ := FALSE;
   IF NOT f_check_session_user_is('auditor', auditor_id_) THEN
-    msg_ := 'cross-user operation';
+    msg_ := '用户无效';
     RETURN;
   END IF;
   IF NOT EXISTS (
     SELECT 1 FROM Activity
     WHERE activity_id=activity_id_ AND activity_state=2
   ) THEN
-    msg_ := 'activity state is invalid';
+    msg_ := '活动状态无效';
     RETURN;
   END IF;
   INSERT INTO "Audit"(auditor_id, activity_id, audit_comment, audit_passed) VALUES (auditor_id_, activity_id_, audition_comment_, audition_passed_);
@@ -293,14 +293,14 @@ DECLARE
 BEGIN
   okay_ := FALSE;
   IF NOT f_check_session_user_is('student', student_id_) THEN
-    msg_ := 'cross-user operation';
+    msg_ := '用户无效';
     RETURN;
   END IF;
   IF NOT EXISTS (
     SELECT 1 FROM DoCheckOut
     WHERE student_id=student_id_ AND activity_id=activity_id_
   ) THEN
-    msg_ := 'you must check out before rating';
+    msg_ := '评价之前必须签退';
     RETURN;
   END IF;
   INSERT INTO Rate(student_id, activity_id, rate_value) VALUES (student_id_, activity_id_, rate_value_);

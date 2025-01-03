@@ -149,7 +149,7 @@ const ActivityDisplay = () => {
         } else {
           return [
             <GridActionsCellItem
-              icon={<CheckCircleIcon />}
+              icon={<CheckCircleIcon color="secondary" />}
               label="报名"
               onClick={async () => {
                 setLoading(true)
@@ -176,6 +176,12 @@ const ActivityDisplay = () => {
     },
     { field: "id", type: "number", headerName: "编号", width: 50 },
     { field: "name", type: "string", headerName: "名称" },
+    {
+      field: "state",
+      type: "string",
+      headerName: "状态",
+      valueGetter: (v: number) => parseActivityState(v),
+    },
     {
       field: "tags",
       headerName: "标签",
@@ -241,12 +247,6 @@ const ActivityDisplay = () => {
       type: "number",
       headerName: "人数上限",
       width: 75,
-    },
-    {
-      field: "state",
-      type: "string",
-      headerName: "状态",
-      valueGetter: (v: number) => parseActivityState(v),
     },
   ]
 
