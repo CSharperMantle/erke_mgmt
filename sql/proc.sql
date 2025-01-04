@@ -104,7 +104,7 @@ BEGIN
     SELECT 1 FROM Activity a
     WHERE a.activity_id=activity_id_ AND a.activity_state IN (0, 1)
   ) THEN
-    msg_ := '活动未开始签到';
+    msg_ := '活动已开始签退或结束';
     RETURN;
   END IF;
   code_ := f_gen_random_checkinout_code();
@@ -155,7 +155,7 @@ BEGIN
     SELECT 1 FROM Activity a
     WHERE a.activity_id=activity_id_ AND a.activity_state IN (1, 2)
   ) THEN
-    msg_ := '活动未开始签退';
+    msg_ := '活动还未签到';
     RETURN;
   END IF;
 
