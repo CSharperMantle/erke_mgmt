@@ -1,6 +1,6 @@
 # erke_mgmt
 
-HDU (2024-2025-1)-S0512290-01 “数据库原理课程实践”课设项目
+HDU (2024-2025-1)-S0512290-01 “数据库原理课程设计”作业
 
 ## 项目结构
 
@@ -36,13 +36,13 @@ DB_PORT = 15432
 FRONTEND_PATH = ../frontend/dist/
 ```
 
-`Rocket.toml`包含后端监听地址端口与Cookie加密配置。配置文件的具体含义见[Rocket.rs官方文档](https://rocket.rs/guide/v0.5/configuration/)和[`CookieJar`的inline docs](https://api.rocket.rs/v0.5/rocket/http/struct.CookieJar#encryption-key)。样例结构如下：
+`Rocket.toml`包含后端监听地址端口与Cookie加密配置。配置文件的具体含义见[Rocket.rs官方文档](https://rocket.rs/guide/v0.5/configuration/)。生成`secret_key`的方法详见[`CookieJar`的inline docs](https://api.rocket.rs/v0.5/rocket/http/struct.CookieJar#encryption-key)。样例结构如下：
 
 ```toml
 [default]
 address = "127.0.0.1"
 port = 8000
-secret_key = [Base64-encoded secrets=]
+secret_key = "[Base64-encoded secrets]"
 ```
 
 前后端的构建命令如下：
