@@ -3,14 +3,14 @@
 HDU (2024-2025-1)-S0512290-01 “数据库原理课程设计”任务
 
 * DBMS：[openGauss](https://opengauss.org/zh/)/[PostgreSQL](https://www.postgresql.org/)
-* CASE工具：PowerDesigner 16.7
+* CASE工具：[PowerDesigner](https://www.powerdesigner.biz/) 16.7
 * 后端：[Rocket.rs](https://rocket.rs/) + [sqlx](https://docs.rs/crate/sqlx)
 * 前端：React + [MUI 6](https://mui.com/material-ui/all-components/) + TypeScript + [Vite](https://vite.dev/)
 
 ## 项目结构
 
-* [pd/](pd/)：PowerDesigner项目文件。（该目录下文件包含绝对路径, 且在Git中视为二进制文件）
-  * erke_powerdesigner.sws: 工作区文件
+* [pd/](pd/)：PowerDesigner项目文件。（该目录下文件包含绝对路径，且在Git中视为二进制文件）
+  * erke_powerdesigner.sws：工作区文件
   * erke_dfd.*：数据流图
   * erke_cdm.*：概念模型
   * erke_ldm.*：逻辑模型
@@ -22,7 +22,7 @@ HDU (2024-2025-1)-S0512290-01 “数据库原理课程设计”任务
 
 ## 构建
 
-1. 使用[PowerDesigner](https://www.powerdesigner.biz/)生成项目文件并将其导入PostgreSQL或openGauss
+1. 使用PowerDesigner生成项目文件并将其导入PostgreSQL或openGauss
 2. 创建角色
    1. 创建管理员角色`erke_admin`
    2. 执行[sql/role.sql](sql/role.sql)创建用户角色
@@ -33,7 +33,7 @@ HDU (2024-2025-1)-S0512290-01 “数据库原理课程设计”任务
    3. 构建前端
 5. 运行后端
 
-例如，DBMS运行于127.0.0.1:15432，且前端构建内容将放于`[backend]/../frontend/dist/`目录下，则`backend/.env`文件应包含如下内容：
+例如，DBMS运行于127.0.0.1:15432，且前端构建产物将放于`[backend]/../frontend/dist/`目录下，则`backend/.env`文件应包含如下内容：
 
 ```ini
 DB_HOST = 127.0.0.1
