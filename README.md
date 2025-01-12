@@ -1,6 +1,6 @@
 # erke_mgmt
 
-HDU (2024-2025-1)-S0512290-01 “数据库原理课程设计”任务
+HDU (2024-2025-1)-S0512290-01 《数据库原理课程设计》 课程项目
 
 * DBMS：[openGauss](https://opengauss.org/zh/)/[PostgreSQL](https://www.postgresql.org/)
 * CASE工具：[PowerDesigner](https://www.powerdesigner.biz/) 16.7
