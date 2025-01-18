@@ -7,7 +7,7 @@ HDU (2024-2025-1)-S0512290-01 《数据库原理课程设计》 课程项目
 * 后端：[Rocket.rs](https://rocket.rs/) + [sqlx](https://docs.rs/crate/sqlx)
 * 前端：React + [MUI 6](https://mui.com/material-ui/all-components/) + TypeScript + [Vite](https://vite.dev/)
 
-项目作者[@CSharperMantle](https://github.com/CSharperMantle)在该课设课程中拿到了5.0/5.0的绩点。
+项目作者之一[@CSharperMantle](https://github.com/CSharperMantle)在该课设课程中拿到了5.0/5.0的绩点。
 
 ![满绩截图](https://github.com/user-attachments/assets/e0d42957-a7e4-4046-9eed-7ea86ed306dc)
 
